@@ -1,7 +1,7 @@
 ﻿import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "artleaf_secret";
+const JWT_SECRET = "artleaf_secret_123"; // 🔥 FIXED (no env confusion)
 
 export const ADMIN_COOKIE_NAME = "artleaf_admin_session";
 
@@ -17,7 +17,6 @@ export function verifyAdminToken(token: string) {
   }
 }
 
-// ✅ ADD THIS BACK (important)
 export function verifyAuth(request: NextRequest) {
   const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
 
