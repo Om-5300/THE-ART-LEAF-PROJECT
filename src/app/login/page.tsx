@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +19,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: "include", // 🔥 required for cookies
         body: JSON.stringify(payload),
       });
 
@@ -30,9 +28,13 @@ export default function LoginPage() {
         return;
       }
 
+      // optional (you can remove later)
       const { token } = await res.json();
       localStorage.setItem("artleaf_admin_token", token);
-      router.push("/admin");
+
+      // 🔥 IMPORTANT FIX → full reload so middleware detects cookie
+      window.location.href = "/admin";
+
     } catch {
       setError("Unable to login right now. Please try again.");
     } finally {
@@ -48,11 +50,29 @@ export default function LoginPage() {
         <p className="login-subtitle">Admin access only.</p>
 
         <form className="form" action={handleSubmit}>
-          <input name="username" placeholder="Username" autoComplete="username" required />
-          <input name="password" type="password" placeholder="Password" autoComplete="current-password" required />
-          <button className="btn btn-primary" type="submit" disabled={loading}>
+          <input
+            name="username"
+            placeholder="Username"
+            autoComplete="username"
+            required
+          />
+
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            autoComplete="current-password"
+            required
+          />
+
+          <button
+            className="btn btn-primary"
+            type="submit"
+            disabled={loading}
+          >
             {loading ? "Signing In..." : "Login"}
           </button>
+
           {error ? <p className="form-error">{error}</p> : null}
         </form>
       </section>
