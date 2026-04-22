@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ADMIN_COOKIE_NAME } from "@/lib/auth";
+import { ADMIN_COOKIE_NAME, verifyAdminToken } from "@/lib/auth";
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
 
-  // 🔥 TEMP: only check if cookie exists
-  if (!token) {
+  // 🔥 Fix: safe verification
+  if (!token || !verifyAdminToken(token)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  return NextResponse.next(); // skip verify
+  return NextResponse.next();
 }
 
 export const config = {
