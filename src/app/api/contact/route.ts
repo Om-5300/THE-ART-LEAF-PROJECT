@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   try {
+    await dbConnect();
     const body = await req.json();
     const { name, email, phone, message } = body;
 
