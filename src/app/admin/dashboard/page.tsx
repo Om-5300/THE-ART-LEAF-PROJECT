@@ -104,8 +104,22 @@ export default function AdminDashboardPage() {
 
   async function addGallery(formData: FormData) {
     const token = getToken();
-    await fetch("/api/gallery", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: formData });
-    loadData(token);
+    const file = formData.get("image") as File;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result as string;
+        const newFormData = new FormData();
+        newFormData.append("title", formData.get("title") as string);
+        newFormData.append("category", formData.get("category") as string);
+        newFormData.append("description", formData.get("description") as string);
+        newFormData.append("imageBase64", base64);
+        newFormData.append("imageType", file.type);
+        await fetch("/api/gallery", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: newFormData });
+        loadData(token);
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   async function deleteGallery(id: string) {
