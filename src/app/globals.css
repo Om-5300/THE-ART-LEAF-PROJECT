@@ -1349,6 +1349,13 @@ td {
   .lightbox-inner {
     padding: 1rem;
   }
+  .testimonials-wrapper {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+ 
+
 }
 
 @media (max-width: 480px) {
