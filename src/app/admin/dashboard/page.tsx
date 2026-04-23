@@ -110,10 +110,10 @@ export default function AdminDashboardPage() {
       // ✅ Upload directly to Cloudinary
       const cloudData = new FormData();
       cloudData.append("file", file);
-      cloudData.append("upload_preset", "YOUR_UPLOAD_PRESET");
+      cloudData.append("upload_preset", "art_leaf");
 
       const cloudRes = await fetch(
-        "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
+        "https://api.cloudinary.com/v1_1/deilfs6vw/image/upload",
         {
           method: "POST",
           body: cloudData,
