@@ -41,8 +41,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    const validCategories = ["fabric", "wedding", "jewellery"];
+    
+    const validCategories = ["fabric", "wedding", "jewellery", "saree-resa", "kuttchi-bharat"];
     if (!validCategories.includes(category)) {
       return NextResponse.json(
         { error: "Invalid category." },
