@@ -10,21 +10,63 @@ import { useEffect, useRef, useState } from "react";
 
 const customerReviews = [
   {
-    quote: "Every detail on my wedding rumal was elegant and meaningful.",
-    name: "Priya Mistry",
+    quote: "Every detail on my wedding rumal was crafted with such precision and elegance. It truly reflected our emotions and added a very personal touch to our special day.",
+    name: "Nidhi Dava",
     service: "Wedding Artistry",
     rating: 5,
   },
   {
-    quote: "Their fabric painting transformed my plain saree into luxury art.",
-    name: "Nisha Patel",
+    quote: "Their fabric painting completely transformed my simple saree into a luxurious masterpiece. The colors, design, and finishing were beyond my expectations.",
+    name: "Nisha Kavar",
     service: "Fabric Painting",
     rating: 5,
   },
   {
-    quote: "Professional, creative, and truly premium finish from start to end.",
-    name: "Aarav Shah",
+    quote: "From start to finish, the experience was professional and smooth. Their creativity and attention to detail made the final product look premium and unique.",
+    name: "Pooja Barasara",
     service: "Custom Decor",
+    rating: 5,
+  },
+  {
+    quote: "The handmade jewellery I received was beautifully designed and had a very fine finish. It perfectly matched my outfit and received so many compliments.",
+    name: "Riya Patel",
+    service: "Jewellery Design",
+    rating: 5,
+  },
+  {
+    quote: "The customized pooja thali was absolutely stunning and thoughtfully designed. It added a special charm and spiritual vibe to our family function.",
+    name: "Kajal Shah",
+    service: "Pooja Thali",
+    rating: 5,
+  },
+  {
+    quote: "The embroidery work was extremely neat and detailed. You can clearly see the dedication and effort that goes into each handmade piece.",
+    name: "Meera Joshi",
+    service: "Embroidery",
+    rating: 5,
+  },
+  {
+    quote: "Their creativity is unmatched. They understood my requirements perfectly and delivered something even better than what I had imagined.",
+    name: "Aarav Shah",
+    service: "Custom Orders",
+    rating: 5,
+  },
+  {
+    quote: "My old saree was redesigned into something so beautiful and modern. It felt like wearing a completely new outfit with emotional value attached.",
+    name: "Krupa Patel",
+    service: "Saree Redesign",
+    rating: 5,
+  },
+  {
+    quote: "The handmade gifts were unique and thoughtfully designed. Perfect for special occasions when you want to give something meaningful and different.",
+    name: "Dhruvi Mehta",
+    service: "Handmade Gifts",
+    rating: 5,
+  },
+  {
+    quote: "Highly recommended for anyone looking for premium handmade art. Their work speaks for itself and truly stands out in quality and creativity.",
+    name: "Yashvi Trivedi",
+    service: "Home Decor",
     rating: 5,
   },
 ];
@@ -96,11 +138,16 @@ export default function HomePage() {
           <p className="eyebrow">Handcrafted Luxury Art Studio</p>
           <h1>Elevating Spaces Through Artistry</h1>
           <p>
-            The Art Leaf creates soulful handmade pieces from custom fabrics to wedding artistry and signature decor.
+            The Art Leaf creates soulful handmade pieces from custom fabrics to
+            wedding artistry and signature decor.
           </p>
           <div className="cta-row">
-            <Link href="/services" className="btn btn-primary">Explore Services</Link>
-            <Link href="/contact" className="btn btn-secondary">Contact Us</Link>
+            <Link href="/services" className="btn btn-primary">
+              Explore Services
+            </Link>
+            <Link href="/contact" className="btn btn-secondary">
+              Contact Us
+            </Link>
           </div>
         </motion.div>
         <motion.div
@@ -110,7 +157,6 @@ export default function HomePage() {
           whileHover={{ rotate: -2, scale: 1.02 }}
         >
           <div className="hero-artmark">
-
             <Image
               src="/theartleaflogo.png"
               alt="The Art Leaf logo"
@@ -128,7 +174,6 @@ export default function HomePage() {
             >
               Drashti Bavarva
             </motion.p>
-
           </div>
         </motion.div>
       </motion.section>
@@ -137,13 +182,22 @@ export default function HomePage() {
         <section>
           <div className="section-header">
             <h2>Featured Services</h2>
-            <Link href="/services" className="btn btn-secondary">View All</Link>
+            <Link href="/services" className="btn btn-secondary">
+              View All
+            </Link>
           </div>
           {servicesLoading ? <p>Loading featured services...</p> : null}
-          {!servicesLoading && featuredServices.length === 0 ? <p>Featured services will appear here soon.</p> : null}
+          {!servicesLoading && featuredServices.length === 0 ? (
+            <p>Featured services will appear here soon.</p>
+          ) : null}
           {!servicesLoading && featuredServices.length > 0 ? (
             <div className="grid-3">
-              {featuredServices.map((service) => <ServiceCard key={service._id || service.title} service={service} />)}
+              {featuredServices.map((service) => (
+                <ServiceCard
+                  key={service._id || service.title}
+                  service={service}
+                />
+              ))}
             </div>
           ) : null}
         </section>
@@ -152,8 +206,13 @@ export default function HomePage() {
       <MotionReveal>
         <section className="glass-card">
           <h2>Gallery Preview</h2>
-          <p>Explore vibrant custom work in fabric painting, wedding decor, and artisan accessories.</p>
-          <Link href="/gallery" className="btn btn-primary">View Full Gallery</Link>
+          <p>
+            Explore vibrant custom work in fabric painting, wedding decor, and
+            artisan accessories.
+          </p>
+          <Link href="/gallery" className="btn btn-primary gallery">
+            View Full Gallery
+          </Link>
         </section>
       </MotionReveal>
 
@@ -163,7 +222,9 @@ export default function HomePage() {
             <div className="testimonials-left">
               <p className="eyebrow">TESTIMONIALS</p>
               <h2>What They Say About Us?</h2>
-              <p>Here's what our clients are saying after availing our services.</p>
+              <p>
+                Here's what our clients are saying after availing our services.
+              </p>
               <div className="review-dots review-dots-desktop">
                 {customerReviews.map((_, index) => (
                   <button
@@ -178,28 +239,44 @@ export default function HomePage() {
             </div>
             <div className="testimonials-right">
               {customerReviews.length > 0 && (
-                <motion.article 
-                  className="review-card-featured" 
-                  whileHover={{ y: -6 }} 
+                <motion.article
+                  className="review-card-featured"
+                  whileHover={{ y: -6 }}
                   transition={{ duration: 0.2 }}
                   key={customerReviews[reviewIndex]?.name}
                 >
                   <p className="review-quotemark">"</p>
-                  <p className="review-quote-text">{customerReviews[reviewIndex]?.quote}</p>
+                  <p className="review-quote-text">
+                    {customerReviews[reviewIndex]?.quote}
+                  </p>
                   <div className="review-meta-featured">
-                    <div>
-                      <strong>{customerReviews[reviewIndex]?.name}</strong>
-                      <span>{customerReviews[reviewIndex]?.service}</span>
+                    <div className="review-user">
+                      <h4 className="review-name">
+                        {customerReviews[reviewIndex]?.name}
+                      </h4>
+                      <p className="review-occasion">
+                        {customerReviews[reviewIndex]?.service}
+                      </p>
                     </div>
                   </div>
                 </motion.article>
               )}
               <div className="review-slider-mobile">
-                <div className="review-slider-track" style={{ transform: `translateX(-${reviewIndex * 100}%)` }}>
+                <div
+                  className="review-slider-track"
+                  style={{ transform: `translateX(-${reviewIndex * 100}%)` }}
+                >
                   {customerReviews.map((review) => (
                     <div key={review.name} className="review-slide">
-                      <motion.article className="glass-card review-card" whileHover={{ y: -6 }} transition={{ duration: 0.2 }}>
-                        <p className="review-stars" aria-label={`${review.rating} out of 5 stars`}>
+                      <motion.article
+                        className="glass-card review-card"
+                        whileHover={{ y: -6 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <p
+                          className="review-stars"
+                          aria-label={`${review.rating} out of 5 stars`}
+                        >
                           {"★".repeat(review.rating)}
                         </p>
                         <p>"{review.quote}"</p>
@@ -231,8 +308,18 @@ export default function HomePage() {
       <MotionReveal>
         <section className="glass-card">
           <h2>Instagram Preview</h2>
-          <p>Follow our latest handcrafted stories and behind-the-scenes artistry.</p>
-          <a href="https://www.instagram.com/the_art_leaf_?igsh=bmJuMm1tc3BodmE0" target="_blank" rel="noreferrer" className="btn btn-secondary">Open Instagram</a>
+          <p>
+            Follow our latest handcrafted stories and behind-the-scenes
+            artistry.
+          </p>
+          <a
+            href="https://www.instagram.com/the_art_leaf_?igsh=bmJuMm1tc3BodmE0"
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn-secondary instagram"
+          >
+            Open Instagram
+          </a>
         </section>
       </MotionReveal>
     </div>

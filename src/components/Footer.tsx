@@ -1,11 +1,11 @@
 ﻿import Image from "next/image";
 import Link from "next/link";
+import { FaInstagram } from "react-icons/fa";
 
 export default function Footer() {
   return (
     <footer className="footer">
       <div className="container footer-inner">
-
         {/* BRAND SECTION */}
         <div className="footer-brand">
           <div className="brand-row">
@@ -29,11 +29,21 @@ export default function Footer() {
         <div className="footer-links">
           <h4>Services</h4>
           <ul>
-            <li><Link href="/services">Fabric Painting</Link></li>
-            <li><Link href="/services">Wedding Rumals</Link></li>
-            <li><Link href="/services">Jewellery Making</Link></li>
-            <li><Link href="/services">Pooja Thalis</Link></li>
-            <li><Link href="/services">Kutchhi Bharat</Link></li>
+            <li>
+              <Link href="/services">Fabric Painting</Link>
+            </li>
+            <li>
+              <Link href="/services">Wedding Rumals</Link>
+            </li>
+            <li>
+              <Link href="/services">Jewellery Making</Link>
+            </li>
+            <li>
+              <Link href="/services">Pooja Thalis</Link>
+            </li>
+            <li>
+              <Link href="/services">Kutchhi Bharat</Link>
+            </li>
           </ul>
         </div>
         {/* CONTACT */}
@@ -41,8 +51,12 @@ export default function Footer() {
           <h4>Contact</h4>
 
           <div className="contact-item">
-            <span>📞</span>
-            <p>+91 88667 35300</p>
+            <span>
+              <FaInstagram className="insta-icon" />
+            </span>
+            <a href="https://www.instagram.com/the_art_leaf_?igsh=bmJuMm1tc3BodmE0" target="_blank">
+              the_art_leaf
+            </a>
           </div>
 
           <div className="contact-item">
@@ -62,7 +76,6 @@ export default function Footer() {
             </p>
           </div>
         </div>
-
       </div>
 
       {/* BOTTOM */}
