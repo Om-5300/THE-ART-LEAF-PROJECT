@@ -16,9 +16,41 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   try {
-    await dbConnect();
     const body = await req.json();
-    const created = await Contact.create(body);
+    const { name, email, phone, message } = body;
+
+    // Validate required fields
+    if (!name || !email || !phone || !message) {
+      return NextResponse.json({ error: "All fields are required." }, { status: 400 });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: "Invalid email format." }, { status: 400 });
+    }
+
+    // Validate phone (basic)
+    if (!/^\+?[\d\s\-\(\)]+$/.test(phone)) {
+      return NextResponse.json({ error: "Invalid phone number." }, { status: 400 });
+    }
+
+    // Trim and validate lengths
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPhone = phone.trim();
+    const trimmedMessage = message.trim();
+
+    if (trimmedName.length < 2 || trimmedMessage.length < 10) {
+      return NextResponse.json({ error: "Name too short or message too short." }, { status: 400 });
+    }
+
+    const created = await Contact.create({
+      name: trimmedName,
+      email: trimmedEmail,
+      phone: trimmedPhone,
+      message: trimmedMessage,
+    });
     return NextResponse.json(created, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Could not save message" }, { status: 500 });

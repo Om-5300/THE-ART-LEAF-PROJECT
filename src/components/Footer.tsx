@@ -1,4 +1,6 @@
-﻿import Link from "next/link";
+﻿import Image from "next/image";
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="footer">
@@ -7,9 +9,11 @@ export default function Footer() {
         {/* BRAND SECTION */}
         <div className="footer-brand">
           <div className="brand-row">
-            <img
+            <Image
               src="/theartleaflogo.png"
               alt="The Art Leaf Logo"
+              width={70}
+              height={70}
               className="footer-logo"
             />
 

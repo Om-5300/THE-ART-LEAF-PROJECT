@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { ContactMessage, GalleryItem, ServiceItem } from "@/types";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -24,7 +24,7 @@ export default function AdminDashboardPage() {
     }
   }
 
-  async function loadData(authToken: string) {
+  const loadData = useCallback(async (authToken: string) => {
     try {
       setError("");
       const headers = { Authorization: `Bearer ${authToken}` };
@@ -59,7 +59,7 @@ export default function AdminDashboardPage() {
       setGallery([]);
       setContacts([]);
     }
-  }
+  }, [router]);
 
   useEffect(() => {
     const stored = localStorage.getItem("artleaf_admin_token") || "";
@@ -68,8 +68,9 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    void Promise.resolve().then(() => loadData(stored));
-  }, [router]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadData(stored);
+  }, [router, loadData]);
 
   async function addService(formData: FormData) {
     const token = getToken();

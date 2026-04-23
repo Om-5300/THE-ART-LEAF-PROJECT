@@ -27,10 +27,6 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     document.body.classList.toggle("nav-open", open);
     return () => document.body.classList.remove("nav-open");
   }, [open]);

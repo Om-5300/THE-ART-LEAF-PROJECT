@@ -2,7 +2,6 @@
   _id?: string;
   title: string;
   icon: string;
-  category: string;
   shortDescription: string;
   description: string;
 };

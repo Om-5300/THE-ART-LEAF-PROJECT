@@ -1,7 +1,7 @@
-﻿import { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
+﻿import jwt from "jsonwebtoken";
+import { NextRequest } from "next/server";
 
-const JWT_SECRET = "artleaf_secret_123"; // 🔥 FIXED (no env confusion)
+const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret"; // Use env, fallback for dev
 
 export const ADMIN_COOKIE_NAME = "artleaf_admin_session";
 
@@ -18,11 +18,20 @@ export function verifyAdminToken(token: string) {
 }
 
 export function verifyAuth(request: NextRequest) {
-  const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
-
-  if (!token || !verifyAdminToken(token)) {
-    throw new Error("Unauthorized");
+  // Check Authorization header first (for API calls from client)
+  const authHeader = request.headers.get("authorization");
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    if (verifyAdminToken(token)) {
+      return true;
+    }
   }
 
-  return true;
+  // Fallback to cookie (for middleware or direct calls)
+  const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
+  if (token && verifyAdminToken(token)) {
+    return true;
+  }
+
+  throw new Error("Unauthorized");
 }
