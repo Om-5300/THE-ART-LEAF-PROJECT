@@ -24,36 +24,39 @@ export default function AdminDashboardPage() {
     }
   }
 
-  const loadData = useCallback(async (authToken: string) => {
-    try {
-      setError("");
-      const headers = { Authorization: `Bearer ${authToken}` };
+  const loadData = useCallback(
+    async (authToken: string) => {
+      try {
+        setError("");
+        const headers = { Authorization: `Bearer ${authToken}` };
 
-      const [s, g, c] = await Promise.all([
-        fetch("/api/services", { headers }),
-        fetch("/api/gallery", { headers }),
-        fetch("/api/contact", { headers }),
-      ]);
+        const [s, g, c] = await Promise.all([
+          fetch("/api/services", { headers }),
+          fetch("/api/gallery", { headers }),
+          fetch("/api/contact", { headers }),
+        ]);
 
-      if (c.status === 401) {
-        localStorage.removeItem("artleaf_admin_token");
-        router.push("/login");
-        return;
+        if (c.status === 401) {
+          localStorage.removeItem("artleaf_admin_token");
+          router.push("/login");
+          return;
+        }
+
+        const [servicesData, galleryData, contactsData] = await Promise.all([
+          parseJsonSafe<ServiceItem[]>(s),
+          parseJsonSafe<GalleryItem[]>(g),
+          parseJsonSafe<ContactMessage[]>(c),
+        ]);
+
+        setServices(Array.isArray(servicesData) ? servicesData : []);
+        setGallery(Array.isArray(galleryData) ? galleryData : []);
+        setContacts(Array.isArray(contactsData) ? contactsData : []);
+      } catch {
+        setError("Unable to load dashboard data.");
       }
-
-      const [servicesData, galleryData, contactsData] = await Promise.all([
-        parseJsonSafe<ServiceItem[]>(s),
-        parseJsonSafe<GalleryItem[]>(g),
-        parseJsonSafe<ContactMessage[]>(c),
-      ]);
-
-      setServices(Array.isArray(servicesData) ? servicesData : []);
-      setGallery(Array.isArray(galleryData) ? galleryData : []);
-      setContacts(Array.isArray(contactsData) ? contactsData : []);
-    } catch {
-      setError("Unable to load dashboard data.");
-    }
-  }, [router]);
+    },
+    [router],
+  );
 
   useEffect(() => {
     const token = getToken();
@@ -117,7 +120,7 @@ export default function AdminDashboardPage() {
         {
           method: "POST",
           body: cloudData,
-        }
+        },
       );
 
       const cloudResult = await cloudRes.json();
@@ -186,15 +189,25 @@ export default function AdminDashboardPage() {
           <form className="form" action={addService}>
             <input name="title" placeholder="Title" required />
             <input name="icon" placeholder="Icon" required />
-            <input name="shortDescription" placeholder="Short description" required />
+            <input
+              name="shortDescription"
+              placeholder="Short description"
+              required
+            />
             <textarea name="description" placeholder="Description" required />
             <button className="btn btn-primary">Save</button>
           </form>
 
           {services.map((s) => (
-            <div key={s._id} className="row-between">
+            <div key={s._id} className="row-between admin-row">
+              {" "}
               <span>{s.title}</span>
-              <button onClick={() => deleteService(s._id!)}>Delete</button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => deleteService(s._id!)}
+              >
+                Delete
+              </button>{" "}
             </div>
           ))}
         </section>
@@ -212,15 +225,21 @@ export default function AdminDashboardPage() {
             </select>
             <input name="description" placeholder="Description" />
             <input type="file" name="image" required />
-            <button disabled={galleryLoading}>
+            <button className="btn btn-primary" disabled={galleryLoading}>
               {galleryLoading ? "Uploading..." : "Upload"}
             </button>
           </form>
 
           {gallery.map((g) => (
-            <div key={g._id} className="row-between">
+            <div key={g._id} className="row-between admin-row">
+              {" "}
               <span>{g.title}</span>
-              <button onClick={() => deleteGallery(g._id!)}>Delete</button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => deleteGallery(g._id!)}
+              >
+                Delete
+              </button>{" "}
             </div>
           ))}
         </section>
@@ -248,7 +267,12 @@ export default function AdminDashboardPage() {
                 <td>{c.phone}</td>
                 <td>{c.message}</td>
                 <td>
-                  <button onClick={() => deleteContact(c._id!)}>Delete</button>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => deleteContact(c._id!)}
+                  >
+                    Delete
+                  </button>{" "}
                 </td>
               </tr>
             ))}
