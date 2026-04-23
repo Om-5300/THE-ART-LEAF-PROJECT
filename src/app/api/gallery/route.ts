@@ -19,42 +19,52 @@ export async function POST(req: NextRequest) {
     verifyAuth(req);
     await dbConnect();
 
-    const form = await req.formData();
-    const title = String(form.get("title") || "").trim();
-    const category = String(form.get("category") || "").toLowerCase().trim();
-    const description = String(form.get("description") || "").trim();
-    const imageBase64 = form.get("imageBase64") as string | null;
-    const imageType = form.get("imageType") as string | null;
+    // ✅ get JSON (not formData)
+    const body = await req.json();
 
+    const title = String(body.title || "").trim();
+    const category = String(body.category || "").toLowerCase().trim();
+    const description = String(body.description || "").trim();
+    const image = String(body.image || "").trim(); // ✅ Cloudinary URL
+
+    // ✅ validations
     if (!title || title.length < 3) {
-      return NextResponse.json({ error: "Title is required and must be at least 3 characters." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Title must be at least 3 characters." },
+        { status: 400 }
+      );
     }
 
-    if (!imageBase64) {
-      return NextResponse.json({ error: "Image is required." }, { status: 400 });
-    }
-
-    // Check base64 size (approx 5MB for Vercel limit)
-    if (imageBase64.length > 5 * 1024 * 1024 * 4 / 3) {
-      return NextResponse.json({ error: "Image size must be less than 5MB." }, { status: 400 });
-    }
-
-    if (!imageType || !imageType.startsWith("image/")) {
-      return NextResponse.json({ error: "File must be an image." }, { status: 400 });
+    if (!image) {
+      return NextResponse.json(
+        { error: "Image URL is required." },
+        { status: 400 }
+      );
     }
 
     const validCategories = ["fabric", "wedding", "jewellery"];
     if (!validCategories.includes(category)) {
-      return NextResponse.json({ error: "Invalid category. Must be one of: fabric, wedding, jewellery." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid category." },
+        { status: 400 }
+      );
     }
 
-    const upload = await cloudinary.uploader.upload(imageBase64, { folder: "the-art-leaf" });
+    // ✅ save directly (NO cloudinary upload here)
+    const created = await Gallery.create({
+      title,
+      category,
+      description,
+      imageUrl: image, // ✅ IMPORTANT
+    });
 
-    const created = await Gallery.create({ title, category, description, imageUrl: upload.secure_url });
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
-    console.error("Gallery upload error:", error);
-    return NextResponse.json({ error: "Could not upload image" }, { status: 500 });
+    console.error("Gallery POST error:", error);
+    return NextResponse.json(
+      { error: "Could not save gallery item" },
+      { status: 500 }
+    );
   }
 }
 
