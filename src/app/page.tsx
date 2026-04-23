@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import MotionReveal from "@/components/MotionReveal";
 import ServiceCard from "@/components/ServiceCard";
 import { ServiceItem } from "@/types";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 const customerReviews = [
   {
@@ -32,6 +32,29 @@ const customerReviews = [
 export default function HomePage() {
   const [featuredServices, setFeaturedServices] = useState<ServiceItem[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const reviewDirection = useRef(1);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setReviewIndex((current) => {
+        const next = current + reviewDirection.current;
+        if (next >= customerReviews.length) {
+          reviewDirection.current = -1;
+          return current - 1;
+        }
+
+        if (next < 0) {
+          reviewDirection.current = 1;
+          return 1;
+        }
+
+        return next;
+      });
+    }, 5000);
+
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -112,7 +135,10 @@ export default function HomePage() {
 
       <MotionReveal>
         <section>
-          <h2>Featured Services</h2>
+          <div className="section-header">
+            <h2>Featured Services</h2>
+            <Link href="/services" className="btn btn-secondary">View All</Link>
+          </div>
           {servicesLoading ? <p>Loading featured services...</p> : null}
           {!servicesLoading && featuredServices.length === 0 ? <p>Featured services will appear here soon.</p> : null}
           {!servicesLoading && featuredServices.length > 0 ? (
@@ -133,21 +159,71 @@ export default function HomePage() {
 
       <MotionReveal>
         <section>
-          <h2>Customer Reviews</h2>
-          <p>Words from clients who trusted The Art Leaf for meaningful handcrafted creations.</p>
-          <div className="grid-3 review-grid">
-            {customerReviews.map((review) => (
-              <motion.article key={review.name} className="glass-card review-card" whileHover={{ y: -6 }} transition={{ duration: 0.2 }}>
-                <p className="review-stars" aria-label={`${review.rating} out of 5 stars`}>
-                  {"★".repeat(review.rating)}
-                </p>
-                <p>“{review.quote}”</p>
-                <div className="review-meta">
-                  <strong>{review.name}</strong>
-                  <span>{review.service}</span>
+          <div className="testimonials-wrapper">
+            <div className="testimonials-left">
+              <p className="eyebrow">TESTIMONIALS</p>
+              <h2>What They Say About Us?</h2>
+              <p>Here's what our clients are saying after availing our services.</p>
+              <div className="review-dots review-dots-desktop">
+                {customerReviews.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className={index === reviewIndex ? "active" : ""}
+                    aria-label={`Show review ${index + 1}`}
+                    onClick={() => setReviewIndex(index)}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="testimonials-right">
+              {customerReviews.length > 0 && (
+                <motion.article 
+                  className="review-card-featured" 
+                  whileHover={{ y: -6 }} 
+                  transition={{ duration: 0.2 }}
+                  key={customerReviews[reviewIndex]?.name}
+                >
+                  <p className="review-quotemark">"</p>
+                  <p className="review-quote-text">{customerReviews[reviewIndex]?.quote}</p>
+                  <div className="review-meta-featured">
+                    <div>
+                      <strong>{customerReviews[reviewIndex]?.name}</strong>
+                      <span>{customerReviews[reviewIndex]?.service}</span>
+                    </div>
+                  </div>
+                </motion.article>
+              )}
+              <div className="review-slider-mobile">
+                <div className="review-slider-track" style={{ transform: `translateX(-${reviewIndex * 100}%)` }}>
+                  {customerReviews.map((review) => (
+                    <div key={review.name} className="review-slide">
+                      <motion.article className="glass-card review-card" whileHover={{ y: -6 }} transition={{ duration: 0.2 }}>
+                        <p className="review-stars" aria-label={`${review.rating} out of 5 stars`}>
+                          {"★".repeat(review.rating)}
+                        </p>
+                        <p>"{review.quote}"</p>
+                        <div className="review-meta">
+                          <strong>{review.name}</strong>
+                          <span>{review.service}</span>
+                        </div>
+                      </motion.article>
+                    </div>
+                  ))}
                 </div>
-              </motion.article>
-            ))}
+                <div className="review-dots review-dots-mobile">
+                  {customerReviews.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className={index === reviewIndex ? "active" : ""}
+                      aria-label={`Show review ${index + 1}`}
+                      onClick={() => setReviewIndex(index)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </MotionReveal>
@@ -162,4 +238,3 @@ export default function HomePage() {
     </div>
   );
 }
-

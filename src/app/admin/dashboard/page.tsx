@@ -102,23 +102,61 @@ export default function AdminDashboardPage() {
     loadData(token);
   }
 
+  const [galleryLoading, setGalleryLoading] = useState(false);
+
   async function addGallery(formData: FormData) {
     const token = getToken();
-    const file = formData.get("image") as File;
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result as string;
-        const newFormData = new FormData();
-        newFormData.append("title", formData.get("title") as string);
-        newFormData.append("category", formData.get("category") as string);
-        newFormData.append("description", formData.get("description") as string);
-        newFormData.append("imageBase64", base64);
-        newFormData.append("imageType", file.type);
-        await fetch("/api/gallery", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: newFormData });
-        loadData(token);
-      };
-      reader.readAsDataURL(file);
+    setError("");
+    setGalleryLoading(true);
+
+    const file = formData.get("image");
+    if (!(file instanceof File)) {
+      setError("Please select an image to upload.");
+      setGalleryLoading(false);
+      return;
+    }
+
+    const readFileAsDataUrl = (fileToRead: File) => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (typeof reader.result === "string") {
+            resolve(reader.result);
+          } else {
+            reject(new Error("Unable to read file."));
+          }
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(fileToRead);
+      });
+    };
+
+    try {
+      const base64 = await readFileAsDataUrl(file);
+      const newFormData = new FormData();
+      newFormData.append("title", String(formData.get("title") || "").trim());
+      newFormData.append("category", String(formData.get("category") || "fabric").trim());
+      newFormData.append("description", String(formData.get("description") || "").trim());
+      newFormData.append("imageBase64", base64);
+      newFormData.append("imageType", file.type);
+
+      const response = await fetch("/api/gallery", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: newFormData,
+      });
+
+      if (!response.ok) {
+        const result = await parseJsonSafe<{ error: string }>(response);
+        setError(result?.error || "Gallery upload failed.");
+      } else {
+        await loadData(token);
+      }
+    } catch (uploadError) {
+      console.error("Gallery UI upload error:", uploadError);
+      setError("Unable to upload image. Please try again.");
+    } finally {
+      setGalleryLoading(false);
     }
   }
 
@@ -172,7 +210,9 @@ export default function AdminDashboardPage() {
             </select>
             <input name="description" placeholder="Description" />
             <input name="image" type="file" accept="image/*" required />
-            <button className="btn btn-primary">Upload</button>
+            <button className="btn btn-primary" disabled={galleryLoading}>
+              {galleryLoading ? "Uploading…" : "Upload"}
+            </button>
           </form>
           <div className="list-stack admin-list">
             {gallery.map((item) => (
