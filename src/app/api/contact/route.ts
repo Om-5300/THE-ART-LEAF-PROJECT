@@ -41,10 +41,6 @@ export async function POST(req: Request) {
     const trimmedPhone = phone.trim();
     const trimmedMessage = message.trim();
 
-    if (trimmedName.length < 2 || trimmedMessage.length < 10) {
-      return NextResponse.json({ error: "Name too short or message too short." }, { status: 400 });
-    }
-
     const created = await Contact.create({
       name: trimmedName,
       email: trimmedEmail,
