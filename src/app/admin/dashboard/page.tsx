@@ -10,13 +10,13 @@ export default function AdminDashboardPage() {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
   const [error, setError] = useState("");
+  const [galleryLoading, setGalleryLoading] = useState(false);
 
   const getToken = () => localStorage.getItem("artleaf_admin_token") || "";
 
   async function parseJsonSafe<T>(res: Response): Promise<T | null> {
     const text = await res.text();
     if (!text) return null;
-
     try {
       return JSON.parse(text) as T;
     } catch {
@@ -28,6 +28,7 @@ export default function AdminDashboardPage() {
     try {
       setError("");
       const headers = { Authorization: `Bearer ${authToken}` };
+
       const [s, g, c] = await Promise.all([
         fetch("/api/services", { headers }),
         fetch("/api/gallery", { headers }),
@@ -46,115 +47,108 @@ export default function AdminDashboardPage() {
         parseJsonSafe<ContactMessage[]>(c),
       ]);
 
-      if (!s.ok || !g.ok || !c.ok) {
-        setError("Unable to load dashboard data right now.");
-      }
-
       setServices(Array.isArray(servicesData) ? servicesData : []);
       setGallery(Array.isArray(galleryData) ? galleryData : []);
       setContacts(Array.isArray(contactsData) ? contactsData : []);
     } catch {
-      setError("Unable to load dashboard data right now.");
-      setServices([]);
-      setGallery([]);
-      setContacts([]);
+      setError("Unable to load dashboard data.");
     }
   }, [router]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("artleaf_admin_token") || "";
-    if (!stored) {
+    const token = getToken();
+    if (!token) {
       router.push("/login");
       return;
     }
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadData(stored);
+    loadData(token);
   }, [router, loadData]);
+
+  // ================= SERVICES =================
 
   async function addService(formData: FormData) {
     const token = getToken();
     const payload = Object.fromEntries(formData.entries());
+
     await fetch("/api/services", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(payload),
     });
+
     loadData(token);
   }
 
   async function deleteService(id: string) {
     const token = getToken();
-    await fetch(`/api/services/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
-    loadData(token);
-  }
-
-  async function editService(service: ServiceItem) {
-    const token = getToken();
-    if (!service._id) return;
-    const title = window.prompt("Update service title", service.title);
-    if (!title) return;
-    await fetch(`/api/services/${service._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...service, title }),
+    await fetch(`/api/services/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
     });
     loadData(token);
   }
 
-  const [galleryLoading, setGalleryLoading] = useState(false);
+  // ================= GALLERY =================
 
   async function addGallery(formData: FormData) {
     const token = getToken();
-    setError("");
     setGalleryLoading(true);
+    setError("");
 
     const file = formData.get("image");
+
     if (!(file instanceof File)) {
-      setError("Please select an image to upload.");
+      setError("Please select an image.");
       setGalleryLoading(false);
       return;
     }
 
-    const readFileAsDataUrl = (fileToRead: File) => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result);
-          } else {
-            reject(new Error("Unable to read file."));
-          }
-        };
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(fileToRead);
-      });
-    };
-
     try {
-      const base64 = await readFileAsDataUrl(file);
-      const newFormData = new FormData();
-      newFormData.append("title", String(formData.get("title") || "").trim());
-      newFormData.append("category", String(formData.get("category") || "fabric").trim());
-      newFormData.append("description", String(formData.get("description") || "").trim());
-      newFormData.append("imageBase64", base64);
-      newFormData.append("imageType", file.type);
+      // ✅ Upload directly to Cloudinary
+      const cloudData = new FormData();
+      cloudData.append("file", file);
+      cloudData.append("upload_preset", "YOUR_UPLOAD_PRESET");
 
+      const cloudRes = await fetch(
+        "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
+        {
+          method: "POST",
+          body: cloudData,
+        }
+      );
+
+      const cloudResult = await cloudRes.json();
+
+      if (!cloudResult.secure_url) {
+        throw new Error("Cloudinary upload failed");
+      }
+
+      // ✅ Send only URL to backend
       const response = await fetch("/api/gallery", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: newFormData,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: formData.get("title"),
+          category: formData.get("category"),
+          description: formData.get("description"),
+          image: cloudResult.secure_url,
+        }),
       });
 
       if (!response.ok) {
-        const result = await parseJsonSafe<{ error: string }>(response);
-        setError(result?.error || "Gallery upload failed.");
-      } else {
-        await loadData(token);
+        throw new Error("Save failed");
       }
-    } catch (uploadError) {
-      console.error("Gallery UI upload error:", uploadError);
-      setError("Unable to upload image. Please try again.");
+
+      await loadData(token);
+    } catch (err) {
+      console.error(err);
+      setError("Upload failed. Try again.");
     } finally {
       setGalleryLoading(false);
     }
@@ -162,21 +156,31 @@ export default function AdminDashboardPage() {
 
   async function deleteGallery(id: string) {
     const token = getToken();
-    await fetch(`/api/gallery/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    await fetch(`/api/gallery/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
     loadData(token);
   }
 
+  // ================= CONTACT =================
+
   async function deleteContact(id: string) {
     const token = getToken();
-    await fetch(`/api/contact/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    await fetch(`/api/contact/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
     loadData(token);
   }
 
   return (
     <div className="container page-pad page-shell">
       <h1 className="page-title">Admin Dashboard</h1>
-      {error ? <p className="form-error">{error}</p> : null}
+      {error && <p className="form-error">{error}</p>}
+
       <div className="grid-2 admin-grid">
+        {/* SERVICES */}
         <section className="glass-card admin-card">
           <h2>Add Service</h2>
           <form className="form" action={addService}>
@@ -186,67 +190,71 @@ export default function AdminDashboardPage() {
             <textarea name="description" placeholder="Description" required />
             <button className="btn btn-primary">Save</button>
           </form>
-          <div className="list-stack admin-list">
-            {services.map((service) => (
-              <div key={service._id || service.title} className="row-between">
-                <span>{service.title}</span>
-                <div className="row-between admin-actions">
-                  <button className="btn btn-secondary" onClick={() => editService(service)} disabled={!service._id}>Edit</button>
-                  <button className="btn btn-secondary" onClick={() => service._id && deleteService(service._id)} disabled={!service._id}>Delete</button>
-                </div>
-              </div>
-            ))}
-          </div>
+
+          {services.map((s) => (
+            <div key={s._id} className="row-between">
+              <span>{s.title}</span>
+              <button onClick={() => deleteService(s._id!)}>Delete</button>
+            </div>
+          ))}
         </section>
 
+        {/* GALLERY */}
         <section className="glass-card admin-card">
           <h2>Upload Gallery Image</h2>
+
           <form className="form" action={addGallery}>
             <input name="title" placeholder="Title" required />
-            <select name="category" defaultValue="fabric" required>
+            <select name="category">
               <option value="fabric">Fabric</option>
               <option value="wedding">Wedding</option>
               <option value="jewellery">Jewellery</option>
             </select>
             <input name="description" placeholder="Description" />
-            <input name="image" type="file" accept="image/*" required />
-            <button className="btn btn-primary" disabled={galleryLoading}>
-              {galleryLoading ? "Uploading…" : "Upload"}
+            <input type="file" name="image" required />
+            <button disabled={galleryLoading}>
+              {galleryLoading ? "Uploading..." : "Upload"}
             </button>
           </form>
-          <div className="list-stack admin-list">
-            {gallery.map((item) => (
-              <div key={item._id || item.title} className="row-between">
-                <span>{item.title}</span>
-                <button className="btn btn-secondary" onClick={() => item._id && deleteGallery(item._id)} disabled={!item._id}>Delete</button>
-              </div>
-            ))}
-          </div>
+
+          {gallery.map((g) => (
+            <div key={g._id} className="row-between">
+              <span>{g.title}</span>
+              <button onClick={() => deleteGallery(g._id!)}>Delete</button>
+            </div>
+          ))}
         </section>
       </div>
 
+      {/* CONTACT */}
       <section className="glass-card admin-card">
         <h2>Contact Submissions</h2>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Name</th><th>Email</th><th>Phone</th><th>Message</th><th /></tr>
-            </thead>
-            <tbody>
-              {contacts.map((item) => (
-                <tr key={item._id || item.email}>
-                  <td>{item.name}</td>
-                  <td>{item.email}</td>
-                  <td>{item.phone}</td>
-                  <td>{item.message}</td>
-                  <td><button className="btn btn-secondary" onClick={() => item._id && deleteContact(item._id)} disabled={!item._id}>Delete</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Message</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {contacts.map((c) => (
+              <tr key={c._id}>
+                <td>{c.name}</td>
+                <td>{c.email}</td>
+                <td>{c.phone}</td>
+                <td>{c.message}</td>
+                <td>
+                  <button onClick={() => deleteContact(c._id!)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </section>
     </div>
   );
 }
-
