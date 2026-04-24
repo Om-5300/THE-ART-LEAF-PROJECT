@@ -53,10 +53,16 @@ export default function AboutPage() {
       <section className="glass-card about-founder">
         <p className="eyebrow">Meet The Founder</p>
         <div className="about-founder-grid">
-          <div className="about-founder-avatar" aria-hidden="true">
-            DB
+          <div className="about-founder-avatar">
+            <Image
+              src="/founder-photo.png"
+              alt="Drashti Bavarva, Founder of The Art Leaf"
+              width={340}
+              height={340}
+              className="founder-photo"
+            />
           </div>
-          <div>
+          <div className="about-founder-content">
             <h2>Founder</h2>
             <p className="about-founder-name">Drashti Bavarva</p>
             <p>

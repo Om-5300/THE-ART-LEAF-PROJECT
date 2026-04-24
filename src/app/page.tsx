@@ -182,7 +182,7 @@ export default function HomePage() {
         <section>
           <div className="section-header">
             <h2>Featured Services</h2>
-            <Link href="/services" className="btn btn-secondary">
+            <Link href="/services" className="btn btn-secondary service-btn">
               View All
             </Link>
           </div>
