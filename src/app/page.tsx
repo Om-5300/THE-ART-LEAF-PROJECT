@@ -143,7 +143,7 @@ export default function HomePage() {
           </p>
           <div className="cta-row">
             <Link href="/about" className="btn btn-primary">
-              Learn More About Us
+              Know More About Us
             </Link>
             <Link href="/contact" className="btn btn-secondary">
               Contact Us
