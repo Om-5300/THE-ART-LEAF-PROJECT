@@ -177,8 +177,8 @@ a {
 }
 
 .about-founder-avatar {
-  width: clamp(180px, 40vw, 340px);
-  height: clamp(180px, 40vw, 340px);
+  width: clamp(250px, 40vw, 340px);
+  height: clamp(250px, 40vw, 340px);
   border-radius: 50%;
   display: grid;
   place-items: center;
