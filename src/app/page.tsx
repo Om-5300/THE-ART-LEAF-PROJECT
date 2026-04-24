@@ -142,8 +142,8 @@ export default function HomePage() {
             wedding artistry and signature decor.
           </p>
           <div className="cta-row">
-            <Link href="/services" className="btn btn-primary">
-              Explore Services
+            <Link href="/about" className="btn btn-primary">
+              Learn More About Us
             </Link>
             <Link href="/contact" className="btn btn-secondary">
               Contact Us
