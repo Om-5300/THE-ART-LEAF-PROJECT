@@ -10,61 +10,71 @@ import { useEffect, useRef, useState } from "react";
 
 const customerReviews = [
   {
-    quote: "Every detail on my wedding rumal was crafted with such precision and elegance. It truly reflected our emotions and added a very personal touch to our special day.",
+    quote:
+      "Every detail on my wedding rumal was crafted with such precision and elegance. It truly reflected our emotions and added a very personal touch to our special day.",
     name: "Nidhi Dava",
     service: "Wedding Artistry",
     rating: 5,
   },
   {
-    quote: "Their fabric painting completely transformed my simple saree into a luxurious masterpiece. The colors, design, and finishing were beyond my expectations.",
+    quote:
+      "Their fabric painting completely transformed my simple saree into a luxurious masterpiece. The colors, design, and finishing were beyond my expectations.",
     name: "Nisha Kavar",
     service: "Fabric Painting",
     rating: 5,
   },
   {
-    quote: "From start to finish, the experience was professional and smooth. Their creativity and attention to detail made the final product look premium and unique.",
+    quote:
+      "From start to finish, the experience was professional and smooth. Their creativity and attention to detail made the final product look premium and unique.",
     name: "Pooja Barasara",
     service: "Custom Decor",
     rating: 5,
   },
   {
-    quote: "The handmade jewellery I received was beautifully designed and had a very fine finish. It perfectly matched my outfit and received so many compliments.",
+    quote:
+      "The handmade jewellery I received was beautifully designed and had a very fine finish. It perfectly matched my outfit and received so many compliments.",
     name: "Riya Patel",
     service: "Jewellery Design",
     rating: 5,
   },
   {
-    quote: "The customized pooja thali was absolutely stunning and thoughtfully designed. It added a special charm and spiritual vibe to our family function.",
+    quote:
+      "The customized pooja thali was absolutely stunning and thoughtfully designed. It added a special charm and spiritual vibe to our family function.",
     name: "Kajal Shah",
     service: "Pooja Thali",
     rating: 5,
   },
   {
-    quote: "The embroidery work was extremely neat and detailed. You can clearly see the dedication and effort that goes into each handmade piece.",
+    quote:
+      "The embroidery work was extremely neat and detailed. You can clearly see the dedication and effort that goes into each handmade piece.",
     name: "Meera Joshi",
     service: "Embroidery",
     rating: 5,
   },
   {
-    quote: "Their creativity is unmatched. They understood my requirements perfectly and delivered something even better than what I had imagined.",
+    quote:
+      "Their creativity is unmatched. They understood my requirements perfectly and delivered something even better than what I had imagined.",
     name: "Aarav Shah",
     service: "Custom Orders",
     rating: 5,
   },
   {
-    quote: "My old saree was redesigned into something so beautiful and modern. It felt like wearing a completely new outfit with emotional value attached.",
+    quote:
+      "My old saree was redesigned into something so beautiful and modern. It felt like wearing a completely new outfit with emotional value attached.",
     name: "Krupa Patel",
     service: "Saree Redesign",
     rating: 5,
   },
   {
-    quote: "The handmade gifts were unique and thoughtfully designed. Perfect for special occasions when you want to give something meaningful and different.",
+    quote:
+      "The handmade gifts were unique and thoughtfully designed. Perfect for special occasions when you want to give something meaningful and different.",
     name: "Dhruvi Mehta",
     service: "Handmade Gifts",
     rating: 5,
   },
   {
-    quote: "Highly recommended for anyone looking for premium handmade art. Their work speaks for itself and truly stands out in quality and creativity.",
+    quote:
+      "Highly recommended for anyone looking for premium handmade art. Their work speaks for itself and truly stands out in quality and creativity.",
     name: "Yashvi Trivedi",
     service: "Home Decor",
     rating: 5,
@@ -75,20 +85,25 @@ export default function HomePage() {
   const [featuredServices, setFeaturedServices] = useState<ServiceItem[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
   const [reviewIndex, setReviewIndex] = useState(0);
+
   const reviewDirection = useRef(1);
+
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
       setReviewIndex((current) => {
-        const next = current + reviewDirection.current;
+        let next = current + reviewDirection.current;
+
         if (next >= customerReviews.length) {
           reviewDirection.current = -1;
-          return current - 1;
+          next = current - 1;
         }
 
         if (next < 0) {
           reviewDirection.current = 1;
-          return 1;
+          next = current + 1;
         }
 
         return next;
@@ -96,7 +111,7 @@ export default function HomePage() {
     }, 5000);
 
     return () => window.clearInterval(interval);
-  }, []);
+  }, [customerReviews.length]);
 
   useEffect(() => {
     let mounted = true;
@@ -106,7 +121,7 @@ export default function HomePage() {
       try {
         const res = await fetch("/api/services", { cache: "no-store" });
         if (!res.ok) throw new Error("Failed to load services");
-        const data = (await res.json()) as ServiceItem[];
+        const data = await res.json();
         if (mounted) setFeaturedServices(data.slice(0, 3));
       } catch {
         if (mounted) setFeaturedServices([]);
@@ -115,7 +130,7 @@ export default function HomePage() {
       }
     }
 
-    void loadFeaturedServices();
+    loadFeaturedServices();
     return () => {
       mounted = false;
     };
@@ -225,19 +240,20 @@ export default function HomePage() {
               <p>
                 Here's what our clients are saying after availing our services.
               </p>
+
               <div className="review-dots review-dots-desktop">
                 {customerReviews.map((_, index) => (
                   <button
                     key={index}
-                    type="button"
                     className={index === reviewIndex ? "active" : ""}
-                    aria-label={`Show review ${index + 1}`}
                     onClick={() => setReviewIndex(index)}
                   />
                 ))}
               </div>
             </div>
+
             <div className="testimonials-right">
+              {/* DESKTOP CARD */}
               {customerReviews.length > 0 && (
                 <motion.article
                   className="review-card-featured"
@@ -249,38 +265,56 @@ export default function HomePage() {
                   <p className="review-quote-text">
                     {customerReviews[reviewIndex]?.quote}
                   </p>
+
                   <div className="review-meta-featured">
                     <div className="review-user">
-                      <h4 className="review-name">
-                        {customerReviews[reviewIndex]?.name}
-                      </h4>
-                      <p className="review-occasion">
-                        {customerReviews[reviewIndex]?.service}
-                      </p>
+                      <h4>{customerReviews[reviewIndex]?.name}</h4>
+                      <p>{customerReviews[reviewIndex]?.service}</p>
                     </div>
                   </div>
                 </motion.article>
               )}
+
+              {/* MOBILE SLIDER */}
               <div className="review-slider-mobile">
                 <div
                   className="review-slider-track"
-                  style={{ transform: `translateX(-${reviewIndex * 100}%)` }}
+                  style={{
+                    transform: `translateX(-${reviewIndex * 100}%)`,
+                    transition: "transform 0.4s ease-in-out",
+                  }}
+                  onTouchStart={(e) => {
+                    touchStartX.current = e.touches[0].clientX;
+                  }}
+                  onTouchEnd={(e) => {
+                    touchEndX.current = e.changedTouches[0].clientX;
+                    const diff = touchStartX.current - touchEndX.current;
+
+                    if (diff > 50) {
+                      // swipe left
+                      setReviewIndex((prev) =>
+                        prev === customerReviews.length - 1 ? 0 : prev + 1,
+                      );
+                    }
+
+                    if (diff < -50) {
+                      // swipe right
+                      setReviewIndex((prev) =>
+                        prev === 0 ? customerReviews.length - 1 : prev - 1,
+                      );
+                    }
+                  }}
                 >
                   {customerReviews.map((review) => (
                     <div key={review.name} className="review-slide">
                       <motion.article
                         className="glass-card review-card"
                         whileHover={{ y: -6 }}
-                        transition={{ duration: 0.2 }}
                       >
-                        <p
-                          className="review-stars"
-                          aria-label={`${review.rating} out of 5 stars`}
-                        >
-                          {"★".repeat(review.rating)}
-                        </p>
+                        <p>{"★".repeat(review.rating)}</p>
                         <p>"{review.quote}"</p>
-                        <div className="review-meta">
+
+                        <div>
                           <strong>{review.name}</strong>
                           <span>{review.service}</span>
                         </div>
@@ -288,13 +322,12 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
+
                 <div className="review-dots review-dots-mobile">
                   {customerReviews.map((_, index) => (
                     <button
                       key={index}
-                      type="button"
                       className={index === reviewIndex ? "active" : ""}
-                      aria-label={`Show review ${index + 1}`}
                       onClick={() => setReviewIndex(index)}
                     />
                   ))}
