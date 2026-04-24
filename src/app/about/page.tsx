@@ -60,7 +60,7 @@ export default function AboutPage() {
         <div className="about-founder-grid">
           <div className="about-founder-avatar">
             <Image
-              src="/founder-photo-2.jpeg"
+              src="/founder-photo.png"
               alt="Drashti Bavarva, Founder of The Art Leaf"
               width={340}
               height={340}
