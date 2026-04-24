@@ -147,15 +147,7 @@ a {
 
 .about-hero-image-wrap {
   width: min(100%, 420px);
-  border-radius: 24px;
-  padding: clamp(0.8rem, 2vw, 1.2rem);
-  background: radial-gradient(
-    circle at 20% 20%,
-    rgba(255, 247, 230, 0.95),
-    rgba(252, 236, 206, 0.55)
-  );
-  border: 1px solid rgba(139, 107, 62, 0.18);
-  box-shadow: 0 24px 46px rgba(121, 93, 52, 0.18);
+  background:none;
 }
 
 .about-hero-image {
