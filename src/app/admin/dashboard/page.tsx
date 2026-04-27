@@ -25,7 +25,7 @@ export default function AdminDashboardPage() {
   }
 
   const loadData = useCallback(
-    async (authToken: string) => {
+    async (authToken: string, mounted: { current: boolean }) => {
       try {
         setError("");
         const headers = { Authorization: `Bearer ${authToken}` };
@@ -48,23 +48,29 @@ export default function AdminDashboardPage() {
           parseJsonSafe<ContactMessage[]>(c),
         ]);
 
-        setServices(Array.isArray(servicesData) ? servicesData : []);
-        setGallery(Array.isArray(galleryData) ? galleryData : []);
-        setContacts(Array.isArray(contactsData) ? contactsData : []);
+        if (mounted.current) {
+          setServices(Array.isArray(servicesData) ? servicesData : []);
+          setGallery(Array.isArray(galleryData) ? galleryData : []);
+          setContacts(Array.isArray(contactsData) ? contactsData : []);
+        }
       } catch {
-        setError("Unable to load dashboard data.");
+        if (mounted.current) setError("Unable to load dashboard data.");
       }
     },
-    [router],
+    [router]
   );
 
   useEffect(() => {
+    const isMounted = { current: true };
     const token = getToken();
     if (!token) {
       router.push("/login");
-      return;
+    } else {
+      loadData(token, isMounted);
     }
-    loadData(token);
+    return () => {
+      isMounted.current = false;
+    };
   }, [router, loadData]);
 
   // ================= SERVICES =================
