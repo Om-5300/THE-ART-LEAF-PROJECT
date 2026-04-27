@@ -20,10 +20,17 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    onScroll();
+    const onScroll = () => {
+      const isScrolled = window.scrollY > 20;
+      setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
+    };
+    // Ensure this runs after mount/hydration is stable
+    const timeout = setTimeout(onScroll, 0);
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -50,9 +57,6 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link href="/login" className="nav-login-btn" onClick={() => setOpen(false)}>
-            Login
-          </Link>
         </div>
       </nav>
 
@@ -77,16 +81,6 @@ export default function Navbar() {
                 </Link>
               </motion.div>
             ))}
-            <motion.div
-              key="login"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: links.length * 0.04 }}
-            >
-              <Link href="/login" className="nav-login-btn mobile-login-btn" onClick={() => setOpen(false)}>
-                Login
-              </Link>
-            </motion.div>
           </motion.div>
         ) : null}
       </AnimatePresence>

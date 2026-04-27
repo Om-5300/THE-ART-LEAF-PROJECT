@@ -9,10 +9,60 @@ const poppins = Poppins({ subsets: ["latin"], variable: "--font-poppins", weight
 
 export const metadata: Metadata = {
   title: {
-    default: "The Art Leaf | Luxury Handmade Art",
+    default: "The Art Leaf | Luxury Handmade Art & Custom Craftsmanship",
     template: "%s | The Art Leaf",
   },
-  description: "Premium handmade custom art, fabric painting, wedding accessories, embroidery, and decorative creations.",
+  description: "Experience premium handmade artistry with The Art Leaf. Custom fabric painting, wedding accessories, designer rumals, and bespoke home decor by Drashti Bavarva.",
+  keywords: ["Handmade Art", "Custom Fabric Painting", "Wedding Rumals", "Luxury Art Studio", "Handmade Jewellery", "Pooja Thali", "Kutchhi Bharat", "Drashti Bavarva", "The Art Leaf"],
+  authors: [{ name: "Drashti Bavarva" }],
+  creator: "The Art Leaf",
+  publisher: "The Art Leaf",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL("https://theartleaf.in"), // Replace with your actual domain
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "The Art Leaf | Luxury Handmade Art",
+    description: "Premium handcrafted art and custom designs for weddings, home decor, and personal style.",
+    url: "https://theartleaf.in",
+    siteName: "The Art Leaf",
+    images: [
+      {
+        url: "/logo.png",
+        width: 800,
+        height: 600,
+        alt: "The Art Leaf Logo",
+      },
+    ],
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Art Leaf | Luxury Handmade Art",
+    description: "Premium handcrafted art and custom designs for weddings, home decor, and personal style.",
+    images: ["/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

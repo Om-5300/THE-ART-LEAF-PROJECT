@@ -2,7 +2,7 @@
 
 import { ContactMessage, GalleryItem, ServiceItem } from "@/types";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -25,9 +25,9 @@ export default function AdminDashboardPage() {
   }
 
   const loadData = useCallback(
-    async (authToken: string) => {
+    async (authToken: string, mounted: { current: boolean }) => {
       try {
-        setError("");
+        if (mounted.current) setError("");
         const headers = { Authorization: `Bearer ${authToken}` };
 
         const [s, g, c] = await Promise.all([
@@ -48,23 +48,30 @@ export default function AdminDashboardPage() {
           parseJsonSafe<ContactMessage[]>(c),
         ]);
 
-        setServices(Array.isArray(servicesData) ? servicesData : []);
-        setGallery(Array.isArray(galleryData) ? galleryData : []);
-        setContacts(Array.isArray(contactsData) ? contactsData : []);
+        if (mounted.current) {
+          setServices(Array.isArray(servicesData) ? servicesData : []);
+          setGallery(Array.isArray(galleryData) ? galleryData : []);
+          setContacts(Array.isArray(contactsData) ? contactsData : []);
+        }
       } catch {
-        setError("Unable to load dashboard data.");
+        if (mounted.current) setError("Unable to load dashboard data.");
       }
     },
     [router],
   );
 
+  const mountedRef = useRef(true);
   useEffect(() => {
+    mountedRef.current = true;
     const token = getToken();
     if (!token) {
       router.push("/login");
-      return;
+    } else {
+      loadData(token, mountedRef);
     }
-    loadData(token);
+    return () => {
+      mountedRef.current = false;
+    };
   }, [router, loadData]);
 
   // ================= SERVICES =================
@@ -82,7 +89,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify(payload),
     });
 
-    loadData(token);
+    loadData(token, mountedRef);
   }
 
   async function deleteService(id: string) {
@@ -91,7 +98,7 @@ export default function AdminDashboardPage() {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
-    loadData(token);
+    loadData(token, mountedRef);
   }
 
   // ================= GALLERY =================
@@ -148,7 +155,7 @@ export default function AdminDashboardPage() {
         throw new Error("Save failed");
       }
 
-      await loadData(token);
+      await loadData(token, mountedRef);
     } catch (err) {
       console.error(err);
       setError("Upload failed. Try again.");
@@ -163,7 +170,7 @@ export default function AdminDashboardPage() {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
-    loadData(token);
+    loadData(token, mountedRef);
   }
 
   // ================= CONTACT =================
@@ -174,7 +181,7 @@ export default function AdminDashboardPage() {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
-    loadData(token);
+    loadData(token, mountedRef);
   }
 
   return (
