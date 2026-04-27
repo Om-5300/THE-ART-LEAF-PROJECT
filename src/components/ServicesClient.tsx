@@ -40,7 +40,7 @@ export default function ServicesClient() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [hasMounted]);
 
   return (
     <div className="container page-pad page-shell">

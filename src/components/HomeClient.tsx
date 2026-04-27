@@ -138,7 +138,7 @@ export default function HomeClient() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [hasMounted]);
 
   return (
     <div className="container page-pad">

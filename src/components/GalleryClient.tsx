@@ -40,7 +40,7 @@ export default function GalleryClient() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [hasMounted]);
 
   return (
     <div className="container page-pad page-shell">
