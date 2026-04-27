@@ -190,6 +190,40 @@ export default function AdminDashboardPage() {
     router.push("/login");
   }
 
+  // ================= SECURITY (Auto Logout) =================
+
+  useEffect(() => {
+    // 1. Logout on Refresh (as requested)
+    const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
+    if (navEntries.length > 0 && navEntries[0].type === "reload") {
+      void handleLogout();
+      return;
+    }
+
+    // 2. Inactivity Logout (e.g., 5 minutes)
+    const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+    let idleTimer: NodeJS.Timeout;
+
+    const resetTimer = () => {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        alert("Session expired due to inactivity.");
+        void handleLogout();
+      }, IDLE_TIMEOUT);
+    };
+
+    // Events to track activity
+    const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
+    events.forEach((evt) => window.addEventListener(evt, resetTimer));
+
+    resetTimer(); // Start timer on mount
+
+    return () => {
+      clearTimeout(idleTimer);
+      events.forEach((evt) => window.removeEventListener(evt, resetTimer));
+    };
+  }, [router]);
+
   return (
     <div className="container page-pad page-shell">
       <div className="row-between">
