@@ -54,7 +54,7 @@ export default function Footer() {
             <span>
               <FaInstagram className="insta-icon" />
             </span>
-            <a href="https://www.instagram.com/the_art_leaf_?igsh=bmJuMm1tc3BodmE0" target="_blank">
+            <a className="instagram_atag" href="https://www.instagram.com/the_art_leaf_?igsh=bmJuMm1tc3BodmE0" target="_blank">
               the_art_leaf_
             </a>
           </div>

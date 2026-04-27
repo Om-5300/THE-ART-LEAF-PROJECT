@@ -316,6 +316,10 @@ a {
   margin-top: 20px;
 }
 
+.whatsapp-btn{
+  padding: 0.6rem 1.35rem;
+  margin-bottom: 20px;
+}
 .service-btn {
   padding: 0.6rem 1.35rem;
   margin-bottom: 0.8rem;
@@ -828,15 +832,20 @@ a {
   font-size: 0.9rem;
 }
 
-.filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
 
-.filter-row.open {
-  display: flex;
-}
+  .filter-row {
+    position: static;   /* 🔥 IMPORTANT */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    margin-top: 0;
+  }
 
 .filter-row button {
   width: auto;
@@ -906,14 +915,6 @@ a {
   margin-top: 0.55rem;
   color: var(--text);
   font-weight: 500;
-}
-
-.filter-row {
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 1rem;
 }
 
 .filter-row button {
@@ -1463,6 +1464,7 @@ td {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
+
 }
 
 @media (max-width: 480px) {
@@ -1532,6 +1534,49 @@ td {
     font-size: 13px;
     padding-inline: 1rem;
   }
+   /* Show filter button */
+    .filter-menu-button {
+      display: flex;
+    }
+
+    /* Hide filters by default */
+    .filter-row {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        z-index: 50;
+
+        display: none;
+        flex-direction: row;
+        gap: 0.75rem;
+
+        margin-top: 0.5rem;
+        padding: 0.75rem;
+
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+        max-height: 36vh;
+        overflow-y: auto;
+      }
+
+    /* Show when open */
+    .filter-row.open {
+      display: flex;
+    }
+
+    /* Full width buttons like your UI */
+    .filter-row button {
+      width: 100%;
+      min-width: unset;
+      padding: 0.9rem;
+      border-radius: 999px;
+      text-align: center;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

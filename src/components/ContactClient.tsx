@@ -62,7 +62,7 @@ export default function ContactClient() {
         {/* CONTACT INFO */}
         <div className="glass-card form-meta contact-meta">
           <a
-            className="btn btn-secondary"
+            className="btn btn-secondary whatsapp-btn"
             href="https://wa.me/918866735300"
             target="_blank"
             rel="noreferrer"
