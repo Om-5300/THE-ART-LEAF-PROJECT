@@ -61,7 +61,7 @@ export default function AboutPage() {
           <div className="about-founder-avatar">
             <Image
               src="/founder-photo.png"
-              alt="Drashti Bavarva, Founder of The Art Leaf"
+              alt="Drashti Barasara, Founder of The Art Leaf"
               width={340}
               height={340}
               className="founder-photo"
@@ -69,7 +69,7 @@ export default function AboutPage() {
           </div>
           <div className="about-founder-content">
             <h2>Founder</h2>
-            <p className="about-founder-name">Drashti Bavarva</p>
+            <p className="about-founder-name">Drashti Barasara</p>
             <p>
               Drashti leads The Art Leaf with a vision to preserve traditional
               artistry while elevating it through premium, contemporary

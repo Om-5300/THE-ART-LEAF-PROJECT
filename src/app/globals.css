@@ -832,8 +832,7 @@ a {
   font-size: 0.9rem;
 }
 
-
-  .filter-row {
+.filter-row {
     position: static;   /* 🔥 IMPORTANT */
     display: flex;
     flex-direction: row;
@@ -845,7 +844,7 @@ a {
     box-shadow: none;
     padding: 0;
     margin-top: 0;
-  }
+}
 
 .filter-row button {
   width: auto;
@@ -1091,7 +1090,7 @@ a {
   margin: 0;
   line-height: 1.5;
 }
-.contact-item a {
+.contact-item .instagram_atag {
   color: #444;
   transition: 0.3s;
   margin-left: 4px;

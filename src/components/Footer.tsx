@@ -20,7 +20,7 @@ export default function Footer() {
             <div>
               <h2>The Art Leaf</h2>
               <p>Elevating Spaces Through Artistry</p>
-              <span className="founder">Drashti Bavarva</span>
+              <span className="founder">Drashti Barasara</span>
             </div>
           </div>
         </div>

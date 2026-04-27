@@ -12,9 +12,9 @@ export const metadata: Metadata = {
     default: "The Art Leaf | Luxury Handmade Art & Custom Craftsmanship",
     template: "%s | The Art Leaf",
   },
-  description: "Experience premium handmade artistry with The Art Leaf. Custom fabric painting, wedding accessories, designer rumals, and bespoke home decor by Drashti Bavarva.",
-  keywords: ["Handmade Art", "Custom Fabric Painting", "Wedding Rumals", "Luxury Art Studio", "Handmade Jewellery", "Pooja Thali", "Kutchhi Bharat", "Drashti Bavarva", "The Art Leaf"],
-  authors: [{ name: "Drashti Bavarva" }],
+  description: "Experience premium handmade artistry with The Art Leaf. Custom fabric painting, wedding accessories, designer rumals, and bespoke home decor by Drashti Barasara.",
+  keywords: ["Handmade Art", "Custom Fabric Painting", "Wedding Rumals", "Luxury Art Studio", "Handmade Jewellery", "Pooja Thali", "Kutchhi Bharat", "Drashti Barasara", "The Art Leaf"],
+  authors: [{ name: "Drashti Barasara" }],
   creator: "The Art Leaf",
   publisher: "The Art Leaf",
   formatDetection: {
