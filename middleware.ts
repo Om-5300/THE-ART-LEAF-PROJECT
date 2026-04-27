@@ -5,9 +5,9 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
   const { pathname } = request.nextUrl;
 
-  // Allow login page
-  if (pathname === "/login") {
-    return NextResponse.next();
+  // If user is already logged in, don't show login page
+  if (pathname === "/login" && token) {
+    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 
   // Protect admin routes
@@ -21,5 +21,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login"],
+  matcher: ["/admin", "/admin/:path*", "/login"],
 };

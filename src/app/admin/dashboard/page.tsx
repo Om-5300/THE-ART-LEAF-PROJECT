@@ -177,9 +177,27 @@ export default function AdminDashboardPage() {
     loadData(token);
   }
 
+  // ================= LOGOUT =================
+
+  async function handleLogout() {
+    // 1. Clear local storage
+    localStorage.removeItem("artleaf_admin_token");
+
+    // 2. Clear cookie via API
+    await fetch("/api/auth/logout", { method: "POST" });
+
+    // 3. Redirect
+    router.push("/login");
+  }
+
   return (
     <div className="container page-pad page-shell">
-      <h1 className="page-title">Admin Dashboard</h1>
+      <div className="row-between">
+        <h1 className="page-title">Admin Dashboard</h1>
+        <button className="btn btn-secondary" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
       {error && <p className="form-error">{error}</p>}
 
       <div className="grid-2 admin-grid">
