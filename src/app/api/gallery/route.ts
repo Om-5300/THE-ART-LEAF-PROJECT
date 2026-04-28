@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    const validCategories = ["fabric", "wedding", "jewellery", "saree-resa", "kuttchi-bharat"];
+    const validCategories = ["fabric", "wedding", "jewellery", "saree-resa", "canvas-painting"];
     if (!validCategories.includes(category)) {
       return NextResponse.json(
         { error: "Invalid category." },

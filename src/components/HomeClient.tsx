@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 const customerReviews = [
   {
     quote:
-      "Every detail on my wedding rumal was crafted with such precision and elegance. It truly reflected our emotions and added a very personal touch to our special day.",
+      "Every detail on my wedding accessories was crafted with such precision and elegance. It truly reflected our emotions and added a very personal touch to our special day.",
     name: "Nidhi Dava",
     service: "Wedding Artistry",
     rating: 5,

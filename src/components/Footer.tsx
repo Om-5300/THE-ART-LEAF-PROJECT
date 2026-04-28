@@ -33,7 +33,7 @@ export default function Footer() {
               <Link href="/services">Fabric Painting</Link>
             </li>
             <li>
-              <Link href="/services">Wedding Rumals</Link>
+              <Link href="/services">Wedding Accessories</Link>
             </li>
             <li>
               <Link href="/services">Jewellery Making</Link>
@@ -42,7 +42,7 @@ export default function Footer() {
               <Link href="/services">Pooja Thalis</Link>
             </li>
             <li>
-              <Link href="/services">Kutchhi Bharat</Link>
+              <Link href="/services">Canvas Painting</Link>
             </li>
           </ul>
         </div>

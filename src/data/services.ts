@@ -9,11 +9,11 @@ export const fallbackServices: ServiceItem[] = [
     description: "Hand-painted garments designed with premium colors, gold accents, and personalized motifs.",
   },
   {
-    title: "Wedding Rumals",
-    icon: "??",
+    title: "Wedding Accessories",
+    icon: "💍",
     category: "Wedding",
     shortDescription: "Antarpat, Kankupagla, Hastamelap",
-    description: "Traditional and custom ceremonial rumals crafted for modern wedding aesthetics.",
+    description: "Traditional and custom ceremonial wedding accessories crafted for modern aesthetics.",
   },
   {
     title: "Jewellery Making",
@@ -37,11 +37,11 @@ export const fallbackServices: ServiceItem[] = [
     description: "Fine tassel embellishments for sarees with coordinated color and material storytelling.",
   },
   {
-    title: "Kutchhi Bharat",
-    icon: "??",
-    category: "Embroidery",
-    shortDescription: "Traditional embroidery artistry",
-    description: "Classic Kutchhi Bharat embroidery adapted into contemporary and custom decor styles.",
+    title: "Canvas Painting",
+    icon: "🎨",
+    category: "Art",
+    shortDescription: "Premium hand-painted canvas",
+    description: "Bespoke canvas paintings that bring life to spaces with premium artistic expression.",
   },
 ];
 

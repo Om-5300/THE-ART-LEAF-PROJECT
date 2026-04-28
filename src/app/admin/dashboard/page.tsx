@@ -275,7 +275,7 @@ export default function AdminDashboardPage() {
               <option value="wedding">Wedding</option>
               <option value="jewellery">Jewellery</option>
               <option value="saree-resa">Saree-Resa</option>
-              <option value="kuttchi-bharat">Kuttchi-Bharat</option>
+              <option value="canvas-painting">Canvas Painting</option>
             </select>
             <input name="description" placeholder="Description" />
             <input type="file" name="image" required />

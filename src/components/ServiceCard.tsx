@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { ServiceItem } from "@/types";
+import Link from "next/link";
 
 export default function ServiceCard({ service }: { service: ServiceItem }) {
+  const serviceId = service._id || encodeURIComponent(service.title);
+
   return (
     <motion.article
       className="glass-card service-card"
@@ -14,7 +17,12 @@ export default function ServiceCard({ service }: { service: ServiceItem }) {
       <span className="service-icon">{service.icon}</span>
       <h3>{service.title}</h3>
       <p className="muted">{service.shortDescription}</p>
-      <p>{service.description}</p>
+      <p className="service-desc-preview">{service.description}</p>
+      <div className="card-cta">
+        <Link href={`/services/${serviceId}`} className="explore-link">
+          Explore Details →
+        </Link>
+      </div>
     </motion.article>
   );
 }

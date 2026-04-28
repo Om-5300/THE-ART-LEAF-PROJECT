@@ -49,7 +49,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
   }, [active]);
 
   const categories = useMemo(
-    () => ["All", "fabric", "wedding", "jewellery", "saree-resa", "kutchhi-bharat"],
+    () => ["All", "fabric", "wedding", "jewellery", "saree-resa", "canvas-painting"],
     []
   );
 
@@ -59,7 +59,12 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
       : normalized.filter((i) => i.category === category);
 
   const getLabel = (c: string) =>
-    c === "All" ? c : c.charAt(0).toUpperCase() + c.slice(1);
+    c === "All"
+      ? c
+      : c
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
 
   // ✅ Safe toggle
   const handleToggle = (e: React.MouseEvent) => {

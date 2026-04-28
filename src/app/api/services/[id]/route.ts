@@ -2,6 +2,30 @@
 import { dbConnect } from "@/lib/db";
 import { verifyAuth } from "@/lib/auth";
 import { Service } from "@/models/Service";
+import mongoose from "mongoose";
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    await dbConnect();
+    const { id } = await params;
+
+    let service;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      service = await Service.findById(id);
+    } else {
+      // Try finding by title if ID is not a valid ObjectId (for fallback services)
+      const decodedTitle = decodeURIComponent(id);
+      service = await Service.findOne({ title: decodedTitle });
+    }
+
+    if (!service) {
+      return NextResponse.json({ error: "Service not found" }, { status: 404 });
+    }
+    return NextResponse.json(service);
+  } catch {
+    return NextResponse.json({ error: "Could not fetch service" }, { status: 500 });
+  }
+}
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
