@@ -12,6 +12,9 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState("");
   const [galleryLoading, setGalleryLoading] = useState(false);
 
+  // New state for modifying services
+  const [editingService, setEditingService] = useState<ServiceItem | null>(null);
+
   const getToken = () => localStorage.getItem("artleaf_admin_token") || "";
 
   async function parseJsonSafe<T>(res: Response): Promise<T | null> {
@@ -73,8 +76,14 @@ export default function AdminDashboardPage() {
     const token = getToken();
     const payload = Object.fromEntries(formData.entries());
 
-    await fetch("/api/services", {
-      method: "POST",
+    const url = editingService
+      ? `/api/services/${editingService._id}`
+      : "/api/services";
+
+    const method = editingService ? "PUT" : "POST";
+
+    await fetch(url, {
+      method: method,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -82,6 +91,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify(payload),
     });
 
+    setEditingService(null);
     loadData(token);
   }
 
@@ -92,6 +102,11 @@ export default function AdminDashboardPage() {
       headers: { Authorization: `Bearer ${token}` },
     });
     loadData(token);
+  }
+
+  function startEditing(service: ServiceItem) {
+    setEditingService(service);
+    // Optional: Scroll to top of the card
   }
 
   // ================= GALLERY =================
@@ -237,31 +252,82 @@ export default function AdminDashboardPage() {
       <div className="grid-2 admin-grid">
         {/* SERVICES */}
         <section className="glass-card admin-card">
-          <h2>Add Service</h2>
-          <form className="form" action={addService}>
-            <input name="title" placeholder="Title" required />
-            <input name="icon" placeholder="Icon" required />
+          <h2>{editingService ? "Modify Service" : "Add Service"}</h2>
+          <form className="form" action={addService} key={editingService?._id || "new"}>
+            <input
+              name="title"
+              placeholder="Title"
+              defaultValue={editingService?.title || ""}
+              required
+            />
+            <input
+              name="icon"
+              placeholder="Icon"
+              defaultValue={editingService?.icon || ""}
+              required
+            />
+            <select
+              name="category"
+              defaultValue={editingService?.category || "Fabric"}
+              required
+            >
+              <option value="Fabric">Fabric</option>
+              <option value="Wedding">Wedding</option>
+              <option value="Jewellery">Jewellery</option>
+              <option value="Decor">Decor</option>
+              <option value="Art">Art</option>
+              <option value="Embroidery">Embroidery</option>
+            </select>
             <input
               name="shortDescription"
               placeholder="Short description"
+              defaultValue={editingService?.shortDescription || ""}
               required
             />
-            <textarea name="description" placeholder="Description" required />
-            <button className="btn btn-primary">Save</button>
+            <textarea
+              name="description"
+              placeholder="Description"
+              defaultValue={editingService?.description || ""}
+              required
+            />
+            <div className="cta-row admin-row">
+              <button className="btn btn-primary" type="submit">
+                {editingService ? "Update Service" : "Save Service"}
+              </button>
+              {editingService && (
+                <button
+                  className="btn btn-secondary"
+                  type="button"
+                  onClick={() => setEditingService(null)}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
 
-          {services.map((s) => (
-            <div key={s._id} className="row-between admin-row">
-              {" "}
-              <span>{s.title}</span>
-              <button
-                className="btn btn-secondary"
-                onClick={() => deleteService(s._id!)}
-              >
-                Delete
-              </button>{" "}
-            </div>
-          ))}
+          <div className="list-stack admin-list">
+            {services.map((s) => (
+              <div key={s._id} className="row-between admin-row glass-card">
+                <span>{s.title}</span>
+                <div className="admin-actions">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => startEditing(s)}
+                    style={{ marginRight: '8px' }}
+                  >
+                    Modify
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => deleteService(s._id!)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* GALLERY */}
@@ -307,6 +373,7 @@ export default function AdminDashboardPage() {
           <table>
             <thead>
               <tr>
+                <th>Date & Time</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
@@ -317,6 +384,18 @@ export default function AdminDashboardPage() {
             <tbody>
               {contacts.map((c) => (
                 <tr key={c._id}>
+                  <td>
+                    {c.createdAt
+                      ? new Date(c.createdAt).toLocaleString('en-IN', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true
+                        })
+                      : 'N/A'}
+                  </td>
                   <td>{c.name}</td>
                   <td>{c.email}</td>
                   <td>{c.phone}</td>

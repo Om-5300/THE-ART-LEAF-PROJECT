@@ -20,13 +20,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const title = String(body.title || "").trim();
     const icon = String(body.icon || "").trim();
+    const category = String(body.category || "General").trim();
     const shortDescription = String(body.shortDescription || "").trim();
     const description = String(body.description || "").trim();
 
     if (!title || !icon || !shortDescription || !description) {
       return NextResponse.json({ error: "All fields are required." }, { status: 400 });
     }
-    const created = await Service.create({ title, icon, shortDescription, description });
+    const created = await Service.create({ title, icon, category, shortDescription, description });
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {

@@ -16,8 +16,7 @@ export default function ServiceCard({ service }: { service: ServiceItem }) {
     >
       <span className="service-icon">{service.icon}</span>
       <h3>{service.title}</h3>
-      <p className="muted">{service.shortDescription}</p>
-      <p className="service-desc-preview">{service.description}</p>
+      <p className="service-desc-preview">{service.shortDescription}</p>
       <div className="card-cta">
         <Link href={`/services/${serviceId}`} className="explore-link">
           Explore Details →

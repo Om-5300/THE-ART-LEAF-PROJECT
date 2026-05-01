@@ -36,6 +36,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const title = String(body.title || "").trim();
     const icon = String(body.icon || "").trim();
+    const category = String(body.category || "General").trim();
     const shortDescription = String(body.shortDescription || "").trim();
     const description = String(body.description || "").trim();
 
@@ -43,7 +44,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "All fields are required." }, { status: 400 });
     }
 
-    const updated = await Service.findByIdAndUpdate(id, { title, icon, shortDescription, description }, { new: true });
+    const updated = await Service.findByIdAndUpdate(
+      id,
+      { title, icon, category, shortDescription, description },
+      { new: true }
+    );
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json({ error: "Could not update service" }, { status: 500 });
