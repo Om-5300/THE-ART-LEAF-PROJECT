@@ -12,8 +12,22 @@ export const metadata: Metadata = {
     default: "The Art Leaf | Luxury Handmade Art & Custom Craftsmanship",
     template: "%s | The Art Leaf",
   },
-  description: "Experience premium handmade artistry with The Art Leaf. Custom fabric painting, wedding accessories, designer rumals, and bespoke home decor by Drashti Barasara.",
-  keywords: ["Handmade Art", "Custom Fabric Painting", "Wedding Accessories", "Luxury Art Studio", "Handmade Jewellery", "Pooja Thali", "Canvas Painting", "Drashti Barasara", "The Art Leaf"],
+  description: "Discover the world of The Art Leaf – where luxury meets tradition. We create exquisite handcrafted art, from bespoke fabric painting and royal wedding accessories to signature jewellery and fine canvas art by Drashti Barasara. Elevate your lifestyle with timeless craftsmanship based in Morbi & Rajkot.",
+  keywords: [
+    "The Art Leaf",
+    "Handmade Art India",
+    "Custom Fabric Painting",
+    "Wedding Accessories Rajkot",
+    "Luxury Art Studio Morbi",
+    "Handmade Jewellery",
+    "Pooja Thali Decoration",
+    "Canvas Painting",
+    "Drashti Barasara",
+    "Bespoke Bridal Rumals",
+    "Traditional Gujarati Art",
+    "Hand-painted Sarees",
+    "Artistic Home Decor"
+  ],
   authors: [{ name: "Drashti Barasara" }],
   creator: "The Art Leaf",
   publisher: "The Art Leaf",
@@ -27,16 +41,16 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "The Art Leaf | Luxury Handmade Art",
-    description: "Premium handcrafted art and custom designs for weddings, home decor, and personal style.",
+    title: "The Art Leaf | Luxury Handmade Art & Custom Designs",
+    description: "Premium handcrafted art and custom designs for weddings, home decor, and personal style by Drashti Barasara.",
     url: "https://theartleaf.in",
     siteName: "The Art Leaf",
     images: [
       {
         url: "/logo.png",
-        width: 800,
-        height: 600,
-        alt: "The Art Leaf Logo",
+        width: 1200,
+        height: 630,
+        alt: "The Art Leaf - Luxury Handmade Art Studio",
       },
     ],
     locale: "en_IN",
@@ -66,8 +80,53 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "The Art Leaf",
+    "image": "https://theartleaf.in/logo.png",
+    "@id": "https://theartleaf.in",
+    "url": "https://theartleaf.in",
+    "telephone": "+91-8866735300",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "B3, LOTUS-158, GHUNADA-ROAD",
+      "addressLocality": "Morbi",
+      "addressRegion": "Gujarat",
+      "postalCode": "363641",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 22.8191,
+      "longitude": 70.8212
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "opens": "09:00",
+      "closes": "20:00"
+    },
+    "sameAs": [
+      "https://www.instagram.com/the_art_leaf_"
+    ]
+  };
+
   return (
     <html lang="en" className={`${playfair.variable} ${poppins.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body>
         <Navbar />
         <main>{children}</main>

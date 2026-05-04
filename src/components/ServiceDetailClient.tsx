@@ -5,6 +5,17 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function ServiceDetailClient({ service }: { service: ServiceItem }) {
+  // Map service to gallery category slug
+  const getGalleryLink = () => {
+    const title = service.title.toLowerCase();
+    if (title.includes("canvas")) return "/gallery?cat=canvas-painting";
+    if (title.includes("fabric")) return "/gallery?cat=fabric";
+    if (title.includes("wedding") || title.includes("accessories")) return "/gallery?cat=wedding";
+    if (title.includes("jewellery")) return "/gallery?cat=jewellery";
+    if (title.includes("saree") || title.includes("tassel")) return "/gallery?cat=saree-resa";
+    return "/gallery";
+  };
+
   return (
     <div className="container page-pad">
       <motion.div
@@ -35,7 +46,7 @@ export default function ServiceDetailClient({ service }: { service: ServiceItem 
               <Link href="/contact" className="btn btn-primary">
                 Enquire Now
               </Link>
-              <Link href="/gallery" className="btn btn-secondary">
+              <Link href={getGalleryLink()} className="btn btn-secondary">
                 View Related Gallery
               </Link>
             </div>

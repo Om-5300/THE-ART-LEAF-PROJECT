@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import GalleryGrid from "@/components/GalleryGrid";
 import { GalleryItem } from "@/types";
 
@@ -48,7 +48,11 @@ export default function GalleryClient() {
       {loading ? <p>Loading gallery...</p> : null}
       {error ? <p className="form-error">{error}</p> : null}
       {!loading && !error && gallery.length === 0 ? <p>No gallery images uploaded yet.</p> : null}
-      {!loading && !error ? <GalleryGrid items={gallery} /> : null}
+      {!loading && !error ? (
+        <Suspense fallback={<p>Loading grid...</p>}>
+          <GalleryGrid items={gallery} />
+        </Suspense>
+      ) : null}
     </div>
   );
 }

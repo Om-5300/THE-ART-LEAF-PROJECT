@@ -157,8 +157,9 @@ export default function HomeClient() {
           <p className="eyebrow">Handcrafted Luxury Art Studio</p>
           <h1>Elevating Spaces Through Artistry</h1>
           <p>
-            The Art Leaf creates soulful handmade pieces from custom fabrics to
-            wedding artistry and signature decor.
+            The Art Leaf brings soul to every creation, offering exquisite handcrafted pieces from bespoke designer fabrics to
+            royal wedding artistry and signature fine art. Discover timeless craftsmanship and unparalleled luxury for your
+            lifestyle, based in Morbi and Rajkot.
           </p>
           <div className="cta-row">
             <Link href="/about" className="btn btn-primary">

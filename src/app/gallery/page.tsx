@@ -2,8 +2,8 @@
 import GalleryClient from "@/components/GalleryClient";
 
 export const metadata: Metadata = {
-  title: "Gallery",
-  description: "Browse the exquisite collection of handcrafted art by The Art Leaf. View our latest work in fabric painting, wedding artistry, and luxury home decor.",
+  title: "Art Gallery | Explore Handcrafted Masterpieces",
+  description: "Browse the exquisite collection of handcrafted art by The Art Leaf. Featuring premium fabric painting, wedding rumals, designer accessories, and bespoke home decor from Morbi and Rajkot.",
 };
 
 export default function GalleryPage() {

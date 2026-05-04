@@ -2,7 +2,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "About" };
+export const metadata: Metadata = {
+  title: "About Drashti Barasara & The Art Leaf Story",
+  description: "Learn about the journey of The Art Leaf and its founder, Drashti Barasara. Discover our commitment to traditional craftsmanship and luxury handmade art in Gujarat.",
+};
 
 export default function AboutPage() {
   return (
@@ -60,7 +63,7 @@ export default function AboutPage() {
         <div className="about-founder-grid">
           <div className="about-founder-avatar">
             <Image
-              src="/founder-photo.png"
+              src="/founder-photo-2.png"
               alt="Drashti Barasara, Founder of The Art Leaf"
               width={340}
               height={340}

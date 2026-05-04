@@ -48,7 +48,7 @@ export default function ContactClient() {
 
           <input name="email" type="email" placeholder="Email" required />
 
-          <input name="phone" placeholder="Phone (optional)" />
+          <input name="phone" placeholder="Phone" required />
 
           <textarea name="message" placeholder="Message" rows={5} required />
 

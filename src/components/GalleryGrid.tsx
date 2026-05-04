@@ -3,13 +3,25 @@
 import { GalleryItem } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
-  const [category, setCategory] = useState("All");
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("cat") || "All";
+
+  const [category, setCategory] = useState(initialCategory);
   const [active, setActive] = useState<GalleryItem | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
+
+  // Update category if URL param changes (e.g. navigating between details)
+  useEffect(() => {
+    const catParam = searchParams.get("cat");
+    if (catParam) {
+      setCategory(catParam);
+    }
+  }, [searchParams]);
 
   // ✅ Outside click fix (no mousedown bug)
   useEffect(() => {
@@ -126,7 +138,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             >
               <Image
                 src={item.imageUrl}
-                alt={item.title}
+                alt={`${item.title} - Luxury Handmade Art by The Art Leaf`}
                 width={480}
                 height={380}
               />
