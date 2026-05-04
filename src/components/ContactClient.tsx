@@ -53,7 +53,14 @@ export default function ContactClient() {
 
       <div className="grid-2">
         {/* FORM */}
-        <form className="glass-card form" action={handleSubmit}>
+        <form
+          className="glass-card form"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            await handleSubmit(formData);
+          }}
+        >
           <input name="name" placeholder="Name" required />
 
           <input name="email" type="email" placeholder="Email" required />
