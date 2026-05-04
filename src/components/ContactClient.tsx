@@ -1,9 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ContactClient() {
   const [status, setStatus] = useState("");
+  const searchParams = useSearchParams();
+  const [initialMessage, setInitialMessage] = useState("");
+
+  useEffect(() => {
+    const subject = searchParams.get("subject");
+    if (subject) {
+      setInitialMessage(`${subject}\n\nHi Drashti, `);
+    }
+  }, [searchParams]);
 
   async function handleSubmit(formData: FormData) {
     setStatus("Sending...");
@@ -50,7 +60,14 @@ export default function ContactClient() {
 
           <input name="phone" placeholder="Phone" required />
 
-          <textarea name="message" placeholder="Message" rows={5} required />
+          <textarea
+            name="message"
+            placeholder="Message"
+            rows={5}
+            defaultValue={initialMessage}
+            key={initialMessage}
+            required
+          />
 
           <button className="btn btn-primary" type="submit">
             Submit

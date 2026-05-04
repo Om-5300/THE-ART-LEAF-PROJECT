@@ -1,5 +1,5 @@
 ﻿"use client";
-
+import Link from "next/link";
 import { GalleryItem } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
@@ -184,8 +184,27 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
               </div>
 
               <div className="lightbox-details">
-                <h3>{active.title}</h3>
-                <p>{active.description}</p>
+                <div className="lightbox-content-inner">
+                  <div className="lightbox-text">
+                    <h3>{active.title}</h3>
+                    <p>{active.description}</p>
+                  </div>
+                  <div className="lightbox-actions">
+                    <a
+                      href={`https://wa.me/918866735300?text=${encodeURIComponent(`Hi Drashti, I am interested in this product from your gallery: ${active.title}. Image: ${active.imageUrl}`)}`}
+                      target="_blank"
+                      className="btn btn-primary gallery-enquiry-btn"
+                    >
+                      Enquire on WhatsApp
+                    </a>
+                    <Link
+                      href={`/contact?subject=${encodeURIComponent(`Inquiry about ${active.title}`)}`}
+                      className="btn btn-secondary gallery-enquiry-btn"
+                    >
+                      Fill Contact Form
+                    </Link>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
