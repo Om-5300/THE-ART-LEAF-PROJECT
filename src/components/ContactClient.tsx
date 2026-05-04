@@ -1,19 +1,22 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ContactClient() {
   const [status, setStatus] = useState("");
-  const searchParams = useSearchParams();
   const [initialMessage, setInitialMessage] = useState("");
 
+  // ✅ Safe way to get query params (no build crash)
   useEffect(() => {
-    const subject = searchParams.get("subject");
-    if (subject) {
-      setInitialMessage(`${subject}\n\nHi Drashti, `);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const subject = params.get("subject");
+
+      if (subject) {
+        setInitialMessage(`${subject}\n\nHi Drashti, `);
+      }
     }
-  }, [searchParams]);
+  }, []);
 
   async function handleSubmit(formData: FormData) {
     setStatus("Sending...");
@@ -71,13 +74,17 @@ export default function ContactClient() {
             name="message"
             placeholder="Message"
             rows={5}
-            defaultValue={initialMessage}
-            key={initialMessage}
+            value={initialMessage}
+            onChange={(e) => setInitialMessage(e.target.value)}
             required
           />
 
-          <button className="btn btn-primary" type="submit">
-            Submit
+          <button
+            className="btn btn-primary"
+            type="submit"
+            disabled={status === "Sending..."}
+          >
+            {status === "Sending..." ? "Sending..." : "Submit"}
           </button>
 
           {status && <p>{status}</p>}
