@@ -1,7 +1,7 @@
 ﻿import { verifyAuth } from "@/lib/auth";
-import cloudinary from "@/lib/cloudinary";
 import { dbConnect } from "@/lib/db";
 import { Gallery } from "@/models/Gallery";
+import { Service } from "@/models/Service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
@@ -19,15 +19,13 @@ export async function POST(req: NextRequest) {
     verifyAuth(req);
     await dbConnect();
 
-    // ✅ get JSON (not formData)
     const body = await req.json();
 
     const title = String(body.title || "").trim();
     const category = String(body.category || "").toLowerCase().trim();
     const description = String(body.description || "").trim();
-    const image = String(body.image || "").trim(); // ✅ Cloudinary URL
+    const image = String(body.image || "").trim();
 
-    // ✅ validations
     if (!title || title.length < 3) {
       return NextResponse.json(
         { error: "Title must be at least 3 characters." },
@@ -42,10 +40,13 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    const validCategories = ["fabric", "wedding", "jewellery", "saree-resa", "canvas-painting"];
+    // Fetch all current services to validate categories dynamically
+    const services = await Service.find({}, 'title');
+    const validCategories = services.map(s => s.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''));
+
     if (!validCategories.includes(category)) {
       return NextResponse.json(
-        { error: "Invalid category." },
+        { error: "Invalid category. Please select from existing services." },
         { status: 400 }
       );
     }

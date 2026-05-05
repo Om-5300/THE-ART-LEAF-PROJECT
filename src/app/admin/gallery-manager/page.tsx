@@ -1,6 +1,6 @@
 "use client";
 
-import { GalleryItem } from "@/types";
+import { GalleryItem, ServiceItem } from "@/types";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
@@ -9,13 +9,14 @@ import Link from "next/link";
 export default function GalleryManagerPage() {
   const router = useRouter();
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [galleryLoading, setGalleryLoading] = useState(false);
 
   const getToken = () => localStorage.getItem("artleaf_admin_token") || "";
 
-  const loadGallery = useCallback(async () => {
+  const loadData = useCallback(async () => {
     const token = getToken();
     if (!token) {
       router.push("/login");
@@ -24,22 +25,34 @@ export default function GalleryManagerPage() {
 
     try {
       setLoading(true);
-      const res = await fetch("/api/gallery", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to load gallery");
-      const data = await res.json();
-      setGallery(data);
+      const [galleryRes, servicesRes] = await Promise.all([
+        fetch("/api/gallery", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch("/api/services", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      ]);
+
+      if (!galleryRes.ok || !servicesRes.ok) throw new Error("Failed to load data");
+
+      const [galleryData, servicesData] = await Promise.all([
+        galleryRes.json(),
+        servicesRes.json()
+      ]);
+
+      setGallery(galleryData);
+      setServices(servicesData);
     } catch (err) {
-      setError("Unable to load gallery images.");
+      setError("Unable to load manager data.");
     } finally {
       setLoading(false);
     }
   }, [router]);
 
   useEffect(() => {
-    loadGallery();
-  }, [loadGallery]);
+    loadData();
+  }, [loadData]);
 
   async function addGallery(formData: FormData) {
     const token = getToken();
@@ -81,7 +94,7 @@ export default function GalleryManagerPage() {
       });
 
       if (!response.ok) throw new Error("Save failed");
-      await loadGallery();
+      await loadData();
     } catch (err) {
       setError("Upload failed. Try again.");
     } finally {
@@ -106,6 +119,9 @@ export default function GalleryManagerPage() {
     }
   }
 
+  // Slugify for consistency with gallery filters
+  const slugify = (text: string) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+
   return (
     <div className="container page-pad page-shell">
       <div className="row-between">
@@ -121,12 +137,13 @@ export default function GalleryManagerPage() {
           <h2>Upload Gallery Image</h2>
           <form className="form" action={addGallery}>
             <input name="title" placeholder="Title" required />
-            <select name="category">
-              <option value="fabric">Fabric</option>
-              <option value="wedding">Wedding</option>
-              <option value="jewellery">Jewellery</option>
-              <option value="saree-resa">Saree-Resa</option>
-              <option value="canvas-painting">Canvas Painting</option>
+            <select name="category" required>
+              <option value="">Select Service Category</option>
+              {services.map(s => (
+                <option key={s._id} value={slugify(s.title)}>
+                  {s.title}
+                </option>
+              ))}
             </select>
             <input name="description" placeholder="Description" />
             <input type="file" name="image" required />
@@ -134,6 +151,9 @@ export default function GalleryManagerPage() {
               {galleryLoading ? "Uploading..." : "Upload"}
             </button>
           </form>
+          <p style={{ fontSize: '0.8rem', marginTop: '1rem', color: 'var(--text-muted)' }}>
+            Note: The category list matches your current Services.
+          </p>
         </section>
 
         {/* IMAGE GRID */}
@@ -148,7 +168,8 @@ export default function GalleryManagerPage() {
                    <Image src={item.imageUrl} alt={item.title} fill style={{ objectFit: 'cover' }} />
                 </div>
                 <div style={{ marginTop: '10px' }}>
-                  <h4 style={{ fontSize: '0.9rem', marginBottom: '4px' }}>{item.title}</h4>
+                  <h4 style={{ fontSize: '0.9rem', marginBottom: '2px' }}>{item.title}</h4>
+                  <p className="eyebrow" style={{ fontSize: '0.65rem', marginBottom: '8px' }}>{item.category}</p>
                   <button
                     className="btn btn-secondary"
                     onClick={() => deleteImage(item._id!)}
