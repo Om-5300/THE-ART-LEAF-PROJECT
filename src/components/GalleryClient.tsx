@@ -2,10 +2,11 @@
 
 import { Suspense, useEffect, useState } from "react";
 import GalleryGrid from "@/components/GalleryGrid";
-import { GalleryItem } from "@/types";
+import { GalleryItem, ServiceItem } from "@/types";
 
 export default function GalleryClient() {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hasMounted, setHasMounted] = useState(false);
@@ -18,14 +19,26 @@ export default function GalleryClient() {
     if (!hasMounted) return;
     let mounted = true;
 
-    async function loadGallery() {
+    async function loadData() {
       try {
-        const res = await fetch("/api/gallery", { cache: "no-store" });
-        if (!res.ok) {
-          throw new Error("Unable to load gallery right now.");
+        const [gRes, sRes] = await Promise.all([
+          fetch("/api/gallery", { cache: "no-store" }),
+          fetch("/api/services", { cache: "no-store" })
+        ]);
+
+        if (!gRes.ok || !sRes.ok) {
+          throw new Error("Unable to load data right now.");
         }
-        const data = (await res.json()) as GalleryItem[];
-        if (mounted) setGallery(data);
+
+        const [gData, sData] = await Promise.all([
+          gRes.json(),
+          sRes.json()
+        ]);
+
+        if (mounted) {
+          setGallery(gData);
+          setServices(sData);
+        }
       } catch (err) {
         if (mounted)
           setError(
@@ -36,7 +49,7 @@ export default function GalleryClient() {
       }
     }
 
-    void loadGallery();
+    void loadData();
     return () => {
       mounted = false;
     };
@@ -50,7 +63,7 @@ export default function GalleryClient() {
       {!loading && !error && gallery.length === 0 ? <p>No gallery images uploaded yet.</p> : null}
       {!loading && !error ? (
         <Suspense fallback={<p>Loading grid...</p>}>
-          <GalleryGrid items={gallery} />
+          <GalleryGrid items={gallery} services={services} />
         </Suspense>
       ) : null}
     </div>

@@ -1,83 +1,54 @@
 ﻿"use client";
 import Link from "next/link";
-import { GalleryItem } from "@/types";
+import { GalleryItem, ServiceItem } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
+export default function GalleryGrid({ items, services }: { items: GalleryItem[], services: ServiceItem[] }) {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("cat") || "All";
+  const initialCategory = searchParams.get("cat") || "all";
 
   const [category, setCategory] = useState(initialCategory);
   const [active, setActive] = useState<GalleryItem | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  // Update category if URL param changes (e.g. navigating between details)
-  useEffect(() => {
-    const catParam = searchParams.get("cat");
-    if (catParam) {
-      setCategory(catParam);
-    }
-  }, [searchParams]);
-
-  // ✅ Outside click fix (no mousedown bug)
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
-        setShowFilters(false);
-      }
-    }
-
-    if (showFilters) {
-      document.addEventListener("click", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [showFilters]);
-
-  const normalized = useMemo(
-    () => items.map((item) => ({
-      ...item,
-      category: item.category.toLowerCase(),
-    })),
-    [items]
-  );
-
-  useEffect(() => {
-    if (active) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [active]);
+  // Slugify helper
+  const slugify = (text: string) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
   const categories = useMemo(() => {
-    const dynamic = Array.from(new Set(items.map(item => item.category.toLowerCase())));
-    // Ensure "all" is not in the list as it's added manually, then sort
-    return ["all", ...dynamic.filter(c => c !== "all").sort()];
-  }, [items]);
+    // 1. Get slugs from current services
+    const serviceSlugs = services.map(s => slugify(s.title));
+
+    // 2. Get categories from existing gallery items (in case some old ones remain)
+    const itemCategories = Array.from(new Set(items.map(item => item.category.toLowerCase())));
+
+    // 3. Merge them (uniques)
+    const combined = Array.from(new Set([...serviceSlugs, ...itemCategories]));
+
+    return ["all", ...combined.filter(c => c !== "all").sort()];
+  }, [services, items]);
 
   const filtered =
     category.toLowerCase() === "all"
       ? normalized
       : normalized.filter((i) => i.category === category.toLowerCase());
 
-  const getLabel = (c: string) =>
-    c.toLowerCase() === "all"
-      ? "All"
-      : c
-          .split("-")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
+  const getLabel = (c: string) => {
+    if (c.toLowerCase() === "all") return "All";
+
+    // Try to find matching service title for pretty label
+    const matchingService = services.find(s => slugify(s.title) === c.toLowerCase());
+    if (matchingService) return matchingService.title;
+
+    // Fallback formatting
+    return c
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
 
   // ✅ Safe toggle
   const handleToggle = (e: React.MouseEvent) => {
