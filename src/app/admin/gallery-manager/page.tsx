@@ -14,6 +14,9 @@ export default function GalleryManagerPage() {
   const [error, setError] = useState("");
   const [galleryLoading, setGalleryLoading] = useState(false);
 
+  // State for modifying an item
+  const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
+
   const getToken = () => localStorage.getItem("artleaf_admin_token") || "";
 
   const loadData = useCallback(async () => {
@@ -54,33 +57,42 @@ export default function GalleryManagerPage() {
     loadData();
   }, [loadData]);
 
-  async function addGallery(formData: FormData) {
+  async function handleGallerySubmit(formData: FormData) {
     const token = getToken();
     setGalleryLoading(true);
     setError("");
 
-    const file = formData.get("image");
-    if (!(file instanceof File)) {
-      setError("Please select an image.");
-      setGalleryLoading(false);
-      return;
-    }
+    const file = formData.get("image") as File;
+    let imageUrl = editingItem?.imageUrl || "";
 
     try {
-      const cloudData = new FormData();
-      cloudData.append("file", file);
-      cloudData.append("upload_preset", "art_leaf");
+      // 1. If a new file is selected, upload it to Cloudinary
+      if (file && file.size > 0) {
+        const cloudData = new FormData();
+        cloudData.append("file", file);
+        cloudData.append("upload_preset", "art_leaf");
 
-      const cloudRes = await fetch(
-        "https://api.cloudinary.com/v1_1/deilfs6vw/image/upload",
-        { method: "POST", body: cloudData }
-      );
+        const cloudRes = await fetch(
+          "https://api.cloudinary.com/v1_1/deilfs6vw/image/upload",
+          { method: "POST", body: cloudData }
+        );
 
-      const cloudResult = await cloudRes.json();
-      if (!cloudResult.secure_url) throw new Error("Cloudinary upload failed");
+        const cloudResult = await cloudRes.json();
+        if (!cloudResult.secure_url) throw new Error("Cloudinary upload failed");
+        imageUrl = cloudResult.secure_url;
+      } else if (!editingItem) {
+        // If adding new but no image selected
+        setError("Please select an image.");
+        setGalleryLoading(false);
+        return;
+      }
 
-      const response = await fetch("/api/gallery", {
-        method: "POST",
+      // 2. Save to our database
+      const url = editingItem ? `/api/gallery/${editingItem._id}` : "/api/gallery";
+      const method = editingItem ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -89,14 +101,17 @@ export default function GalleryManagerPage() {
           title: formData.get("title"),
           category: formData.get("category"),
           description: formData.get("description"),
-          image: cloudResult.secure_url,
+          image: imageUrl,
         }),
       });
 
       if (!response.ok) throw new Error("Save failed");
+
+      setEditingItem(null);
       await loadData();
     } catch (err) {
-      setError("Upload failed. Try again.");
+      console.error(err);
+      setError("Operation failed. Try again.");
     } finally {
       setGalleryLoading(false);
     }
@@ -113,6 +128,7 @@ export default function GalleryManagerPage() {
       });
       if (res.ok) {
         setGallery((prev) => prev.filter((item) => item._id !== id));
+        if (editingItem?._id === id) setEditingItem(null);
       }
     } catch (err) {
       alert("Delete failed");
@@ -132,12 +148,17 @@ export default function GalleryManagerPage() {
       </div>
 
       <div className="grid-2 admin-grid" style={{ marginTop: '2rem', alignItems: 'start' }}>
-        {/* UPLOAD FORM */}
+        {/* UPLOAD / MODIFY FORM */}
         <section className="glass-card admin-card">
-          <h2>Upload Gallery Image</h2>
-          <form className="form" action={addGallery}>
-            <input name="title" placeholder="Title" required />
-            <select name="category" required>
+          <h2>{editingItem ? "Modify Photo Details" : "Upload Gallery Image"}</h2>
+          <form className="form" action={handleGallerySubmit} key={editingItem?._id || "new"}>
+            <input
+              name="title"
+              placeholder="Title"
+              defaultValue={editingItem?.title || ""}
+              required
+            />
+            <select name="category" defaultValue={editingItem?.category || ""} required>
               <option value="">Select Service Category</option>
               {services.map(s => (
                 <option key={s._id} value={slugify(s.title)}>
@@ -145,15 +166,42 @@ export default function GalleryManagerPage() {
                 </option>
               ))}
             </select>
-            <input name="description" placeholder="Description" />
-            <input type="file" name="image" required />
-            <button className="btn btn-primary" disabled={galleryLoading}>
-              {galleryLoading ? "Uploading..." : "Upload"}
-            </button>
+            <input
+              name="description"
+              placeholder="Description"
+              defaultValue={editingItem?.description || ""}
+            />
+
+            <div style={{ margin: '5px 0' }}>
+              <label style={{ fontSize: '0.8rem', display: 'block', marginBottom: '4px' }}>
+                {editingItem ? "Replace image (optional):" : "Select Image:"}
+              </label>
+              <input type="file" name="image" required={!editingItem} />
+            </div>
+
+            <div className="cta-row admin-row">
+              <button className="btn btn-primary" disabled={galleryLoading}>
+                {galleryLoading ? "Processing..." : (editingItem ? "Update Details" : "Upload")}
+              </button>
+              {editingItem && (
+                <button
+                  className="btn btn-secondary"
+                  type="button"
+                  onClick={() => setEditingItem(null)}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
-          <p style={{ fontSize: '0.8rem', marginTop: '1rem', color: 'var(--text-muted)' }}>
-            Note: The category list matches your current Services.
-          </p>
+          {editingItem && (
+             <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                <p style={{ fontSize: '0.8rem' }}>Current Image Preview:</p>
+                <div style={{ position: 'relative', height: '100px', width: '100px', margin: '8px auto', borderRadius: '8px', overflow: 'hidden' }}>
+                  <Image src={editingItem.imageUrl} alt="preview" fill style={{ objectFit: 'cover' }} />
+                </div>
+             </div>
+          )}
         </section>
 
         {/* IMAGE GRID */}
@@ -170,13 +218,23 @@ export default function GalleryManagerPage() {
                 <div style={{ marginTop: '10px' }}>
                   <h4 style={{ fontSize: '0.9rem', marginBottom: '2px' }}>{item.title}</h4>
                   <p className="eyebrow" style={{ fontSize: '0.65rem', marginBottom: '8px' }}>{item.category}</p>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => deleteImage(item._id!)}
-                    style={{ width: '100%', fontSize: '0.75rem', minHeight: '30px' }}
-                  >
-                    Delete
-                  </button>
+
+                  <div style={{ display: 'flex', gap: '5px' }}>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => setEditingItem(item)}
+                      style={{ flex: 1, fontSize: '0.75rem', minHeight: '30px', padding: '4px' }}
+                    >
+                      Modify
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => deleteImage(item._id!)}
+                      style={{ flex: 1, fontSize: '0.75rem', minHeight: '30px', padding: '4px' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
