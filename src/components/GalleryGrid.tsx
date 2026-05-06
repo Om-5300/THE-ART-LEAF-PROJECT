@@ -1,61 +1,90 @@
 ﻿"use client";
+
 import Link from "next/link";
 import { GalleryItem, ServiceItem } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
-export default function GalleryGrid({ items, services }: { items: GalleryItem[], services: ServiceItem[] }) {
+export default function GalleryGrid({
+  items,
+  services,
+}: {
+  items: GalleryItem[];
+  services: ServiceItem[];
+}) {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("cat") || "all";
 
   const [category, setCategory] = useState(initialCategory);
   const [active, setActive] = useState<GalleryItem | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+
   const filterRef = useRef<HTMLDivElement>(null);
 
   // Slugify helper
-  const slugify = (text: string) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  const slugify = (text: string) =>
+    text
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]+/g, "");
 
+  // Normalize gallery item categories
+  const normalized = items.map((item) => ({
+    ...item,
+    category: item.category.toLowerCase(),
+  }));
+
+  // Categories
   const categories = useMemo(() => {
-    // 1. Get slugs from current services
-    const serviceSlugs = services.map(s => slugify(s.title));
+    const serviceSlugs = services.map((s) => slugify(s.title));
 
-    // 2. Get categories from existing gallery items (in case some old ones remain)
-    const itemCategories = Array.from(new Set(items.map(item => item.category.toLowerCase())));
+    const itemCategories = Array.from(
+      new Set(items.map((item) => item.category.toLowerCase()))
+    );
 
-    // 3. Merge them (uniques)
-    const combined = Array.from(new Set([...serviceSlugs, ...itemCategories]));
+    const combined = Array.from(
+      new Set([...serviceSlugs, ...itemCategories])
+    );
 
-    return ["all", ...combined.filter(c => c !== "all").sort()];
+    return ["all", ...combined.filter((c) => c !== "all").sort()];
   }, [services, items]);
 
+  // Filtered items
   const filtered =
     category.toLowerCase() === "all"
       ? normalized
-      : normalized.filter((i) => i.category === category.toLowerCase());
+      : normalized.filter(
+          (i) => i.category === category.toLowerCase()
+        );
 
+  // Category label
   const getLabel = (c: string) => {
     if (c.toLowerCase() === "all") return "All";
 
-    // Try to find matching service title for pretty label
-    const matchingService = services.find(s => slugify(s.title) === c.toLowerCase());
+    const matchingService = services.find(
+      (s) => slugify(s.title) === c.toLowerCase()
+    );
+
     if (matchingService) return matchingService.title;
 
-    // Fallback formatting
     return c
       .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .map(
+        (word) =>
+          word.charAt(0).toUpperCase() + word.slice(1)
+      )
       .join(" ");
   };
 
-  // ✅ Safe toggle
+  // Toggle mobile filters
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowFilters((prev) => !prev);
   };
 
+  // Change category
   const handleCategoryChange = (c: string) => {
     setCategory(c);
     setShowFilters(false);
@@ -63,8 +92,8 @@ export default function GalleryGrid({ items, services }: { items: GalleryItem[],
 
   return (
     <>
+      {/* Filter Bar */}
       <div className="gallery-filter-bar" ref={filterRef}>
-        {/* 🔥 Mobile button */}
         <button
           type="button"
           className="filter-menu-button"
@@ -76,7 +105,6 @@ export default function GalleryGrid({ items, services }: { items: GalleryItem[],
           </span>
         </button>
 
-        {/* 🔥 Filter options */}
         <div className={`filter-row ${showFilters ? "open" : ""}`}>
           {categories.map((c) => (
             <button
@@ -91,6 +119,7 @@ export default function GalleryGrid({ items, services }: { items: GalleryItem[],
         </div>
       </div>
 
+      {/* Gallery Grid */}
       <motion.div
         layout
         className={`gallery-grid ${showFilters ? "blurred" : ""}`}
@@ -114,13 +143,16 @@ export default function GalleryGrid({ items, services }: { items: GalleryItem[],
                 width={480}
                 height={380}
               />
-              <span>{item.title}</span>
+
+              <span className="gallery-title">
+                {item.title}
+              </span>
             </motion.button>
           ))}
         </AnimatePresence>
       </motion.div>
 
-      {/* 🔥 Lightbox */}
+      {/* Lightbox */}
       <AnimatePresence>
         {active ? (
           <motion.div
@@ -133,9 +165,21 @@ export default function GalleryGrid({ items, services }: { items: GalleryItem[],
             <motion.div
               className="lightbox-inner glass-card"
               onClick={(e) => e.stopPropagation()}
-              initial={{ opacity: 0, y: 20, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.98 }}
+              initial={{
+                opacity: 0,
+                y: 20,
+                scale: 0.98,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+              }}
+              exit={{
+                opacity: 0,
+                y: 20,
+                scale: 0.98,
+              }}
               transition={{ duration: 0.25 }}
             >
               <button
@@ -161,16 +205,22 @@ export default function GalleryGrid({ items, services }: { items: GalleryItem[],
                     <h3>{active.title}</h3>
                     <p>{active.description}</p>
                   </div>
+
                   <div className="lightbox-actions">
                     <a
-                      href={`https://wa.me/918866735300?text=${encodeURIComponent(`Hi Drashti, I am interested in this product from your gallery: ${active.title}. Image: ${active.imageUrl}`)}`}
+                      href={`https://wa.me/918866735300?text=${encodeURIComponent(
+                        `Hi Drashti, I am interested in this product from your gallery: ${active.title}. Image: ${active.imageUrl}`
+                      )}`}
                       target="_blank"
                       className="btn btn-primary gallery-enquiry-btn"
                     >
                       Enquire on WhatsApp
                     </a>
+
                     <Link
-                      href={`/contact?subject=${encodeURIComponent(`Inquiry about ${active.title}`)}`}
+                      href={`/contact?subject=${encodeURIComponent(
+                        `Inquiry about ${active.title}`
+                      )}`}
                       className="btn btn-secondary gallery-enquiry-btn"
                     >
                       Fill Contact Form

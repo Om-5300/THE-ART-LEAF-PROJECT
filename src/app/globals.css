@@ -996,7 +996,7 @@ a {
   margin-top: 0.55rem;
   color: var(--text);
   font-weight: 500;
-  min-height: 30px;
+  min-height: 40px;
 }
 
 .filter-row button {
@@ -1457,7 +1457,7 @@ td {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
   .page-pad {
     padding-top: 6.2rem;
     gap: 2.2rem;
