@@ -6,7 +6,6 @@ export default function ContactClient() {
   const [status, setStatus] = useState("");
   const [initialMessage, setInitialMessage] = useState("");
 
-  // ✅ Safe way to get query params (no build crash)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
