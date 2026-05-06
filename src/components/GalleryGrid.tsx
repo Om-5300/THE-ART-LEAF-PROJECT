@@ -60,19 +60,20 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
     };
   }, [active]);
 
-  const categories = useMemo(
-    () => ["All", "fabric", "wedding", "jewellery", "saree-resa", "canvas-painting"],
-    []
-  );
+  const categories = useMemo(() => {
+    const dynamic = Array.from(new Set(items.map(item => item.category.toLowerCase())));
+    // Ensure "all" is not in the list as it's added manually, then sort
+    return ["all", ...dynamic.filter(c => c !== "all").sort()];
+  }, [items]);
 
   const filtered =
-    category === "All"
+    category.toLowerCase() === "all"
       ? normalized
-      : normalized.filter((i) => i.category === category);
+      : normalized.filter((i) => i.category === category.toLowerCase());
 
   const getLabel = (c: string) =>
-    c === "All"
-      ? c
+    c.toLowerCase() === "all"
+      ? "All"
       : c
           .split("-")
           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
