@@ -996,6 +996,7 @@ a {
   margin-top: 0.55rem;
   color: var(--text);
   font-weight: 500;
+  min-height: 30px;
 }
 
 .filter-row button {
