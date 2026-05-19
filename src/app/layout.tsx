@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     default: "The Art Leaf | Luxury Handmade Art & Custom Craftsmanship",
     template: "%s | The Art Leaf",
   },
-  description: "Discover the world of The Art Leaf – where luxury meets tradition. We create exquisite handcrafted art, from bespoke fabric painting and royal wedding accessories to signature jewellery and fine canvas art by Drashti Barasara. Elevate your lifestyle with timeless craftsmanship based in Morbi & Rajkot.",
+  description: "Discover the world of The Art Leaf – where luxury meets tradition. We create exquisite handcrafted art, from bespoke fabric painting and royal wedding accessories to signature jewellery and fine canvas art by Drashti Bavarva. Elevate your lifestyle with timeless craftsmanship based in Morbi & Rajkot.",
   keywords: [
     "The Art Leaf",
     "Handmade Art India",
@@ -22,13 +22,13 @@ export const metadata: Metadata = {
     "Handmade Jewellery",
     "Pooja Thali Decoration",
     "Canvas Painting",
-    "Drashti Barasara",
+    "Drashti Bavarva",
     "Bespoke Bridal Rumals",
     "Traditional Gujarati Art",
     "Hand-painted Sarees",
     "Artistic Home Decor"
   ],
-  authors: [{ name: "Drashti Barasara" }],
+  authors: [{ name: "Drashti Bavarva" }],
   creator: "The Art Leaf",
   publisher: "The Art Leaf",
   formatDetection: {
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "The Art Leaf | Luxury Handmade Art & Custom Designs",
-    description: "Premium handcrafted art and custom designs for weddings, home decor, and personal style by Drashti Barasara.",
+    description: "Premium handcrafted art and custom designs for weddings, home decor, and personal style by Drashti Bavarva.",
     url: "https://theartleaf.in",
     siteName: "The Art Leaf",
     images: [

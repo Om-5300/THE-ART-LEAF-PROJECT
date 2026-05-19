@@ -192,7 +192,7 @@ export default function HomeClient() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              Drashti Barasara
+              Drashti Bavarva
             </motion.p>
           </div>
         </motion.div>

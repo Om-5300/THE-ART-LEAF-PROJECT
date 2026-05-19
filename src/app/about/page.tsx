@@ -3,8 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About Drashti Barasara & The Art Leaf Story",
-  description: "Learn about the journey of The Art Leaf and its founder, Drashti Barasara. Discover our commitment to traditional craftsmanship and luxury handmade art in Gujarat.",
+  title: "About Drashti Bavarva & The Art Leaf Story",
+  description: "Learn about the journey of The Art Leaf and its founder, Drashti Bavarva. Discover our commitment to traditional craftsmanship and luxury handmade art in Gujarat.",
 };
 
 export default function AboutPage() {
@@ -64,7 +64,7 @@ export default function AboutPage() {
           <div className="about-founder-avatar">
             <Image
               src="/founder-photo-2.png"
-              alt="Drashti Barasara, Founder of The Art Leaf"
+              alt="Drashti Bavarva, Founder of The Art Leaf"
               width={340}
               height={340}
               className="founder-photo"
@@ -72,7 +72,7 @@ export default function AboutPage() {
           </div>
           <div className="about-founder-content">
             <h2>Founder</h2>
-            <p className="about-founder-name">Drashti Barasara</p>
+            <p className="about-founder-name">Drashti Bavarva</p>
             <p>
               Drashti leads The Art Leaf with a vision to preserve traditional
               artistry while elevating it through premium, contemporary
